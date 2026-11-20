@@ -61,15 +61,6 @@
     toastRoot.appendChild(t);
     setTimeout(() => t.remove(), 2200);
   }
-  function clock() {
-    const d = new Date();
-    const pad = n => String(n).padStart(2, '0');
-    $('#clock').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes());
-    const weeks = ['日', '一', '二', '三', '四', '五', '六'];
-    $('#date').textContent = `${d.getMonth() + 1}月${d.getDate()}日 周${weeks[d.getDay()]}`;
-  }
-  clock(); setInterval(clock, 1000);
-
   function renderNav() {
     const page = STATE.appPage;
     nav.innerHTML = TABS.map(t => `<button class="nav-btn ${page === t.key ? 'active' : ''}" data-nav="${t.key}"><span class="nav-ico">${t.icon}</span><span>${t.label}</span></button>`).join('') +
@@ -98,7 +89,7 @@
     const its = ITEMS.filter(i => i.layer === layer);
     const urgent = its.filter(i => i.remainingDays <= 2).length;
     const bar = its.map(i => `<i class="${i.freshness}"></i>`).join('') || '<i></i>';
-    const foods = its.slice(0, 2).map(i => `<span>${i.icon} ${esc(i.name)}</span>`).join('');
+    const foods = its.slice(0, 3).map(i => `<span>${i.icon}</span>`).join('');
     return `<button class="zone-card ${layer.includes('冷冻') ? 'cold' : ''}" data-action="zone" data-layer="${esc(layer)}">
       <div class="zone-top"><span class="zone-ico">${layerIcon(layer)}</span>${esc(layer)}</div>
       <div class="zone-temp">${esc((LAYER_META[layer] || {}).temp || '')}</div>
@@ -237,7 +228,11 @@
   function showZoneModal(layer) {
     const its = ITEMS.filter(i => i.layer === layer);
     openModal(modalHead(layerIcon(layer), layer, (LAYER_META[layer] || {}).temp + ' · 共 ' + its.length + ' 件') +
-      its.map(i => `<div class="detail-row"><span>${i.icon} ${esc(i.name)}</span><span>${i.quantity}${esc(i.unit)} · ${i.remainingDays === 0 ? '已过期' : '还剩 ' + i.remainingDays + ' 天'}</span></div>`).join('') +
+      `<div class="zone-detail-list">${its.map(i => `<div class="zone-detail-row">
+        <span class="zd-ico">${i.icon}</span><span class="zd-name">${esc(i.name)}</span>
+        <span class="zd-qty">${i.quantity}${esc(i.unit)}</span>
+        <span class="zd-days ${i.freshness}">${i.remainingDays === 0 ? '已过期' : i.remainingDays + ' 天'}</span>
+      </div>`).join('')}</div>` +
       '<div class="modal-actions"><button class="btn btn-ghost" data-action="close">关闭</button><button class="btn btn-primary" data-go="fridge">查看全部食材</button></div>');
   }
   function showExpiryModal() {

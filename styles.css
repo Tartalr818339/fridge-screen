@@ -245,6 +245,76 @@ button{cursor:pointer}
 .food-card b{display:block;font-size:11px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .food-card small{display:block;font-size:10px;color:#FF8A8E;margin-top:2px}
 
+/* iPad 屏幕尺寸与适老可读性 */
+.screen-frame{width:min(1024px,94vw);height:min(700px,92vh);min-height:560px;border-width:8px;border-radius:24px}
+.screen-header{height:64px;padding:0 18px;gap:12px}
+.brand{min-width:auto}
+.brand-mark{width:36px;height:36px;font-size:17px;border-radius:11px}
+.brand strong{font-size:15px}
+.brand small{font-size:11px}
+.status-chip{font-size:14px;padding:8px 14px;min-height:38px}
+.screen-nav{width:112px;padding:12px 9px}
+.nav-btn{min-height:50px;font-size:15px;gap:8px}
+.nav-ico{font-size:20px}
+.screen-content{padding:16px 18px 20px}
+.page-head{margin-bottom:13px}
+.page-head h1{font-size:22px}
+.page-head p,.hint{font-size:14px}
+.panel{padding:15px;border-radius:16px}
+.panel-head{margin-bottom:11px}
+.panel-head h2{font-size:18px}
+.grid-home{grid-template-columns:210px minmax(300px,1fr) 230px;gap:12px}
+.zone-card{min-height:120px;padding:11px}
+.zone-top{font-size:16px}
+.zone-temp{font-size:13px}
+.zone-foods span{font-size:18px;padding:0}
+.mini-bar{height:8px}
+.zone-count,.zone-urgent{font-size:14px}
+.fridge-shell{width:160px;padding:10px 9px 12px}
+.fridge-zone-label{font-size:12px}
+.fridge-seg{min-height:35px}
+.fs-name{font-size:12px}
+.fs-count{font-size:13px}
+.food-strip-title{font-size:13px}
+.food-card-row{gap:7px}
+.food-card{padding:9px 4px}
+.food-card span{font-size:26px}
+.food-card b{font-size:13px}
+.food-card small{font-size:12px}
+.expiry-tab{font-size:14px;min-width:72px;min-height:44px}
+.expiry-row{padding:10px 0}
+.expiry-emoji{font-size:24px}
+.expiry-name{font-size:15px}
+.expiry-days{font-size:14px}
+.today-card{padding:13px}
+.today-orb{width:48px;height:48px;font-size:25px}
+.today-card strong{font-size:16px}
+.today-card p{font-size:13px}
+.item-name{font-size:16px}
+.item-meta{font-size:13px}
+.restock-name,.setting-card h3,.setting-card p{font-size:15px}
+
+/* 弹窗单独恢复浅色高对比 */
+.modal-card{--ink:#16231C;--muted:#6B7C72;--line:#DDE7E0;--soft:#E8F7EE;--deep:#0E7C3A;background:#fff;color:#16231C;font-size:15px}
+.modal-card .modal-head h3,.modal-card .modal-head p,.modal-card .detail-row,.modal-card .field label,.modal-card .model-option b,.modal-card .model-option span,.modal-card .photo-drop{color:#16231C}
+.modal-card .modal-head p,.modal-card .detail-row{font-size:15px}
+.modal-card .btn-ghost{background:#E8F7EE;color:#0E7C3A}
+.modal-card .btn-primary{background:#0E7C3A;color:#fff}
+.modal-card .add-tab{background:#E8F7EE;color:#0E7C3A;font-size:14px}
+.modal-card .add-tab.active{background:#0E7C3A;color:#fff}
+.modal-card .batch-seg{color:#6B7C72}
+.modal-card .batch-seg.active{background:#fff;color:#0E7C3A}
+.modal-card .close-x{background:#F1F5F2;color:#6B7C72}
+.modal-card input,.modal-card textarea,.modal-card select{color:#16231C}
+.zone-detail-list{margin-top:6px}
+.zone-detail-row{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;background:#F4F8F5;margin-bottom:8px}
+.zd-ico{font-size:32px;width:42px;text-align:center;flex:none}
+.zd-name{flex:1;font-size:17px;font-weight:800;color:#16231C}
+.zd-qty{font-size:15px;font-weight:700;color:#6B7C72}
+.zd-days{font-size:15px;font-weight:800;color:#0E7C3A;min-width:52px;text-align:right}
+.zd-days.yellow{color:#8A6600}
+.zd-days.red{color:#C93B40}
+
 @media(max-width:900px){
   .stage{padding:0}
   .screen-frame{width:100vw;height:100vh;min-height:0;border-width:0;border-radius:0}

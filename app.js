@@ -98,11 +98,41 @@
     const its = ITEMS.filter(i => i.layer === layer);
     const urgent = its.filter(i => i.remainingDays <= 2).length;
     const bar = its.map(i => `<i class="${i.freshness}"></i>`).join('') || '<i></i>';
+    const foods = its.slice(0, 2).map(i => `<span>${i.icon} ${esc(i.name)}</span>`).join('');
     return `<button class="zone-card ${layer.includes('冷冻') ? 'cold' : ''}" data-action="zone" data-layer="${esc(layer)}">
       <div class="zone-top"><span class="zone-ico">${layerIcon(layer)}</span>${esc(layer)}</div>
       <div class="zone-temp">${esc((LAYER_META[layer] || {}).temp || '')}</div>
+      <div class="zone-foods">${foods || '<span>这一层还空着</span>'}</div>
       <div class="zone-foot"><span class="mini-bar">${bar}</span><span class="zone-count">${its.length} 件</span>${urgent ? `<span class="zone-urgent">${urgent} 急</span>` : ''}</div>
     </button>`;
+  }
+  function fridgeVisual() {
+    const layers = currentLayers();
+    const fresh = layers.filter(l => !l.includes('冷冻'));
+    const cold = layers.filter(l => l.includes('冷冻'));
+    const seg = layer => {
+      const its = ITEMS.filter(i => i.layer === layer);
+      const bar = its.map(i => `<i class="${i.freshness}"></i>`).join('') || '<i></i>';
+      return `<button class="fridge-seg ${layer.includes('冷冻') ? 'cold' : ''}" data-action="zone" data-layer="${esc(layer)}">
+        <span class="fs-ico">${layerIcon(layer)}</span><span class="fs-name">${esc(layer)}</span><span class="fs-count">${its.length}</span><span class="fs-bar">${bar}</span>
+      </button>`;
+    };
+    const urgent = ITEMS.filter(i => i.remainingDays <= 2).sort((a, b) => a.remainingDays - b.remainingDays).slice(0, 3);
+    return `<section class="panel visual-panel">
+      <div class="panel-head"><h2>冰箱实时视图</h2><span class="hint">点选分区查看</span></div>
+      <div class="fridge-illustration">
+        <div class="fridge-shell">
+          <div class="fridge-zone-label">冷藏区 · 2~8℃</div>
+          <div class="fridge-top">${fresh.map(seg).join('')}</div>
+          <div class="fridge-divider"></div>
+          <div class="fridge-zone-label cold">冷冻区 · -18℃</div>
+          <div class="fridge-bottom">${cold.map(seg).join('')}</div>
+          <div class="fridge-handle"></div>
+        </div>
+      </div>
+      <div class="food-strip-title">优先吃掉</div>
+      <div class="food-card-row">${urgent.map(i => `<div class="food-card"><span>${i.icon}</span><b>${esc(i.name)}</b><small>${i.remainingDays === 0 ? '已过期' : '还剩 ' + i.remainingDays + ' 天'}</small></div>`).join('') || '<div class="hint">没有快到期食材</div>'}</div>
+    </section>`;
   }
   function expiryWindows() {
     return [
@@ -125,6 +155,7 @@
     const list = expiryItems().slice(0, 4);
     return `<div class="page-head"><div><h1>早上好，今天想吃些什么</h1><p>冰箱里有 ${ITEMS.length} 件食材 · ${soon} 件建议优先吃掉</p></div><button class="btn btn-primary" data-action="add-open">＋ 录入食材</button></div>
       <div class="grid-home">
+        ${fridgeVisual()}
         <section class="panel zones-panel">
           <div class="panel-head"><h2>冰箱分区</h2><button class="link-btn" data-go="fridge">查看全部食材 ›</button></div>
           <div class="model-banner"><div><strong>🧊 ${esc(currentModel().name)}</strong><small>${layers.length} 个分区 · 冷藏与冷冻已区分</small></div><button class="link-btn" data-action="model">更换 / 拍照识别 ›</button></div>
@@ -142,15 +173,6 @@
           <button class="today-card" data-action="dish-modal" style="width:100%;border:0;text-align:left">
             <span class="today-orb">🍳</span><div><strong>输入任意菜名，帮你对照冰箱</strong><p>冰箱食材只用来帮你省事，不替你换菜</p></div><span class="arrow">›</span>
           </button>
-        </section>
-        <section class="panel quick-panel">
-          <div class="panel-head"><h2>快捷操作</h2><span class="hint">屏幕端常用功能</span></div>
-          <div class="quick-grid">
-            <button class="quick-btn" data-action="add-photo"><b>📷</b><span>拍照录入</span><small>识别食材入库</small></button>
-            <button class="quick-btn" data-action="voice-quick"><b>🎤</b><span>语音录入</span><small>说出食材即可</small></button>
-            <button class="quick-btn" data-go="restock"><b>🛒</b><span>补货清单</span><small>${STATE.restock.filter(r => r.status === '待补').length} 项待补</small></button>
-            <button class="quick-btn" data-action="pair"><b>📡</b><span>碰一碰</span><small>连接手机与冰箱</small></button>
-          </div>
         </section>
       </div>`;
   }

@@ -39,6 +39,7 @@
   let addMode = 'photo';
   let addBatch = false;
   let voiceRecognition = null;
+  let homeRecipeIndex = 0;
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -85,87 +86,111 @@
   function go(page) { STATE.appPage = page; render(); }
 
   /* ---------- 页面 ---------- */
-  function zoneCard(layer) {
-    const its = ITEMS.filter(i => i.layer === layer);
-    const urgent = its.filter(i => i.remainingDays <= 2).length;
-    const bar = its.map(i => `<i class="${i.freshness}"></i>`).join('') || '<i></i>';
-    const foods = its.slice(0, 3).map(i => `<span>${i.icon}</span>`).join('');
-    return `<button class="zone-card ${layer.includes('冷冻') ? 'cold' : ''}" data-action="zone" data-layer="${esc(layer)}">
-      <div class="zone-top"><span class="zone-ico">${layerIcon(layer)}</span>${esc(layer)}</div>
-      <div class="zone-temp">${esc((LAYER_META[layer] || {}).temp || '')}</div>
-      <div class="zone-foods">${foods || '<span>这一层还空着</span>'}</div>
-      <div class="zone-foot"><span class="mini-bar">${bar}</span><span class="zone-count">${its.length} 件</span>${urgent ? `<span class="zone-urgent">${urgent} 急</span>` : ''}</div>
-    </button>`;
+  function urgentItems() {
+    return ITEMS.filter(i => i.remainingDays >= 0 && i.remainingDays <= 2)
+      .sort((a, b) => a.remainingDays - b.remainingDays);
   }
-  function fridgeVisual() {
+  function homeVisual() {
     const layers = currentLayers();
     const fresh = layers.filter(l => !l.includes('冷冻'));
     const cold = layers.filter(l => l.includes('冷冻'));
     const seg = layer => {
       const its = ITEMS.filter(i => i.layer === layer);
-      const bar = its.map(i => `<i class="${i.freshness}"></i>`).join('') || '<i></i>';
+      const tone = its.some(i => i.remainingDays <= 1) ? 'red'
+        : its.some(i => i.remainingDays <= 2) ? 'yellow'
+        : its.length ? 'green' : 'empty';
       return `<button class="fridge-seg ${layer.includes('冷冻') ? 'cold' : ''}" data-action="zone" data-layer="${esc(layer)}">
-        <span class="fs-ico">${layerIcon(layer)}</span><span class="fs-name">${esc(layer)}</span><span class="fs-count">${its.length}</span><span class="fs-bar">${bar}</span>
+        <span class="fs-ico">${layerIcon(layer)}</span><span class="fs-name">${esc(layer)}</span>
+        <span class="fs-count">${its.length}</span><span class="fs-dot ${tone}"></span>
       </button>`;
     };
-    const urgent = ITEMS.filter(i => i.remainingDays <= 2).sort((a, b) => a.remainingDays - b.remainingDays).slice(0, 3);
-    return `<section class="panel visual-panel">
-      <div class="panel-head"><h2>冰箱实时视图</h2><span class="hint">点选分区查看</span></div>
+    return `<section class="panel home-visual">
+      <div class="panel-head"><h2>冰箱一览</h2><span class="hint">点分区看详情</span></div>
       <div class="fridge-illustration">
         <div class="fridge-shell">
-          <div class="fridge-zone-label">冷藏区 · 2~8℃</div>
+          <div class="fridge-zone-label">冷藏 · 2~8℃</div>
           <div class="fridge-top">${fresh.map(seg).join('')}</div>
           <div class="fridge-divider"></div>
-          <div class="fridge-zone-label cold">冷冻区 · -18℃</div>
+          <div class="fridge-zone-label cold">冷冻 · -18℃</div>
           <div class="fridge-bottom">${cold.map(seg).join('')}</div>
           <div class="fridge-handle"></div>
         </div>
       </div>
-      <div class="food-strip-title">优先吃掉</div>
-      <div class="food-card-row">${urgent.map(i => `<div class="food-card"><span>${i.icon}</span><b>${esc(i.name)}</b><small>${i.remainingDays === 0 ? '已过期' : '还剩 ' + i.remainingDays + ' 天'}</small></div>`).join('') || '<div class="hint">没有快到期食材</div>'}</div>
+      <div class="visual-legend"><span><i class="dot green"></i>新鲜</span><span><i class="dot yellow"></i>2 天内</span><span><i class="dot red"></i>尽快吃</span></div>
+      <button class="model-line" data-action="model">🧊 ${esc(currentModel().name)} · ${layers.length} 个分区 <span>更换 ›</span></button>
     </section>`;
   }
-  function expiryWindows() {
-    return [
-      { d: 0, label: '已过期', test: i => i.remainingDays === 0 },
-      { d: 1, label: '1天内', test: i => i.remainingDays === 1 },
-      { d: 2, label: '2天内', test: i => i.remainingDays >= 1 && i.remainingDays <= 2 },
-      { d: 3, label: '3天内', test: i => i.remainingDays >= 1 && i.remainingDays <= 3 }
-    ];
+  function reminderPanel(list) {
+    const rows = list.slice(0, 2).map(i => {
+      const tip = i.remainingDays === 0 ? '已过期，建议尽快处理'
+        : i.remainingDays === 1 ? '明天到期，今天安排正好'
+        : '还剩 2 天，优先吃掉';
+      return `<div class="reminder-row" data-action="item" data-id="${i.id}">
+        <span class="reminder-emoji">${i.icon}</span>
+        <span class="reminder-copy"><b>${esc(i.name)}</b><small>${tip}</small></span>
+        <span class="reminder-tag ${i.freshness}">${i.remainingDays === 0 ? '过期' : i.remainingDays + '天'}</span>
+      </div>`;
+    }).join('');
+    const restock = STATE.restock.find(r => r.status === '待补');
+    const restockRow = restock ? `<div class="reminder-row soft">
+      <span class="reminder-emoji">🛒</span>
+      <span class="reminder-copy"><b>${esc(restock.name)}</b><small>常买清单里还缺，顺手补上吧</small></span>
+      <button class="mini-btn" data-action="add-restock" data-name="${esc(restock.name)}">加入补货</button>
+    </div>` : '';
+    const empty = !rows && !restockRow ? '<div class="empty-note">最近没有需要操心的事，冰箱状态很好</div>' : '';
+    return `<section class="panel reminder-panel">
+      <div class="panel-head"><h2>温馨提醒</h2><span class="hint">重要的先说</span></div>
+      ${rows}${restockRow}${empty}
+      <button class="link-btn" data-go="fridge">查看全部食材 ›</button>
+    </section>`;
   }
-  function expiryItems() {
-    const pool = ITEMS.filter(i => i.remainingDays >= 0 && i.remainingDays <= 3);
-    const w = expiryWindows().find(x => x.d === STATE.expiryDay) || expiryWindows()[3];
-    return pool.filter(w.test).sort((a, b) => a.remainingDays - b.remainingDays);
+  function recipeCandidates(urgent) {
+    const urgentNames = new Set(urgent.map(i => i.name));
+    const haveName = n => ITEMS.some(i => i.name === n);
+    return RECIPES.slice().sort((a, b) => {
+      const score = r => (r.expiring || []).filter(n => urgentNames.has(n)).length * 3
+        + r.ingredients.filter(x => haveName(typeof x === 'string' ? x : x.name)).length;
+      return score(b) - score(a) || a.minutes - b.minutes;
+    });
+  }
+  function recipePanel(urgent) {
+    const list = recipeCandidates(urgent);
+    if (!list.length) return '';
+    const r = list[homeRecipeIndex % list.length];
+    const urgentNames = new Set(urgent.map(i => i.name));
+    const used = (r.expiring || []).filter(n => urgentNames.has(n));
+    const have = r.ingredients
+      .map(x => typeof x === 'string' ? x : (x.have ? x.name : null))
+      .filter(Boolean).slice(0, 4);
+    return `<section class="panel recipe-spotlight">
+      <div class="panel-head"><h2>今日推荐</h2><button class="link-btn" data-action="recipe-next">换一道 ›</button></div>
+      <button class="spotlight-main" data-action="recipe" data-id="${r.id}">
+        <span class="spotlight-thumb" style="background:${r.thumb}">${r.emoji}</span>
+        <span class="spotlight-copy">
+          <b>${esc(r.name)}</b>
+          <small>⏱ ${r.minutes} 分钟 · ${r.ingredients.length} 样食材</small>
+          <em>${used.length ? '正好用掉快到期的 ' + used.map(esc).join('、') : '用冰箱现有食材做点好的'}</em>
+        </span>
+        <span class="spotlight-arrow">›</span>
+      </button>
+      <div class="spotlight-have">${have.length ? have.map(n => `<span>✓ ${esc(n)}</span>`).join('') : '<span>冰箱里还没有明确用料</span>'}</div>
+      <button class="dish-entry" data-action="dish-modal">想做别的？告诉我想吃什么</button>
+    </section>`;
   }
   function pageHome() {
     const layers = currentLayers();
-    const fresh = layers.filter(l => !l.includes('冷冻'));
-    const cold = layers.filter(l => l.includes('冷冻'));
-    const soon = ITEMS.filter(i => i.remainingDays >= 0 && i.remainingDays <= 3).length;
-    const list = expiryItems().slice(0, 4);
-    return `<div class="page-head"><div><h1>早上好，今天想吃些什么</h1><p>冰箱里有 ${ITEMS.length} 件食材 · ${soon} 件建议优先吃掉</p></div><button class="btn btn-primary" data-action="add-open">＋ 录入食材</button></div>
-      <div class="grid-home">
-        ${fridgeVisual()}
-        <section class="panel zones-panel">
-          <div class="panel-head"><h2>冰箱分区</h2><button class="link-btn" data-go="fridge">查看全部食材 ›</button></div>
-          <div class="model-banner"><div><strong>🧊 ${esc(currentModel().name)}</strong><small>${layers.length} 个分区 · 冷藏与冷冻已区分</small></div><button class="link-btn" data-action="model">更换 / 拍照识别 ›</button></div>
-          ${fresh.length ? `<div class="zone-group"><div class="zone-group-title"><i></i>冷藏区 · 2~8℃</div><div class="zone-grid">${fresh.map(zoneCard).join('')}</div></div>` : ''}
-          ${cold.length ? `<div class="zone-group cold"><div class="zone-group-title"><i></i>冷冻区 · -18℃</div><div class="zone-grid">${cold.map(zoneCard).join('')}</div></div>` : ''}
-        </section>
-        <section class="panel expiry-panel">
-          <div class="panel-head"><h2>到期提醒</h2><span class="hint">${soon} 件</span></div>
-          <div class="expiry-tabs">${expiryWindows().map(w => `<button class="expiry-tab ${STATE.expiryDay === w.d ? 'active' : ''}" data-action="expiry-day" data-day="${w.d}">${w.label}</button>`).join('')}</div>
-          ${list.length ? list.map(i => `<div class="expiry-row"><span class="expiry-emoji">${i.icon}</span><span class="expiry-name">${esc(i.name)}</span><span class="expiry-days ${i.freshness}">${i.remainingDays === 0 ? '已过期' : '还剩 ' + i.remainingDays + ' 天'}</span></div>`).join('') : '<div class="hint">这个范围内没有食材</div>'}
-          ${expiryItems().length > 4 ? `<button class="link-btn" data-action="expiry-all">查看全部 ${expiryItems().length} 件 ›</button>` : ''}
-        </section>
-        <section class="panel recipe-panel">
-          <div class="panel-head"><h2>今天吃什么</h2><span class="hint">用户想吃什么就做什么</span></div>
-          <button class="today-card" data-action="dish-modal" style="width:100%;border:0;text-align:left">
-            <span class="today-orb">🍳</span><div><strong>输入任意菜名，帮你对照冰箱</strong><p>冰箱食材只用来帮你省事，不替你换菜</p></div><span class="arrow">›</span>
-          </button>
-        </section>
-      </div>`;
+    const urgent = urgentItems();
+    return `<div class="page-head home-head">
+      <div><h1>冰箱里有什么</h1><p>${ITEMS.length} 件食材 · ${layers.length} 个分区 · 刚刚同步</p></div>
+      <button class="btn btn-primary" data-action="add-open">＋ 录入食材</button>
+    </div>
+    <div class="home-grid">
+      ${homeVisual()}
+      <div class="home-side">
+        ${reminderPanel(urgent)}
+        ${recipePanel(urgent)}
+      </div>
+    </div>`;
   }
   function pageFridge() {
     const layers = currentLayers();
@@ -234,12 +259,6 @@
         <span class="zd-days ${i.freshness}">${i.remainingDays === 0 ? '已过期' : i.remainingDays + ' 天'}</span>
       </div>`).join('')}</div>` +
       '<div class="modal-actions"><button class="btn btn-ghost" data-action="close">关闭</button><button class="btn btn-primary" data-go="fridge">查看全部食材</button></div>');
-  }
-  function showExpiryModal() {
-    const items = expiryItems();
-    openModal(modalHead('⏰', '快到期食材', '共 ' + items.length + ' 件，按紧急程度排序') +
-      items.map(i => `<div class="detail-row"><span>${i.icon} ${esc(i.name)}</span><span>${i.remainingDays === 0 ? '已过期' : '还剩 ' + i.remainingDays + ' 天'} · ${i.quantity}${esc(i.unit)}</span></div>`).join('') +
-      '<div class="modal-actions"><button class="btn btn-primary" data-action="close">知道了</button></div>');
   }
   function showItemModal(id) {
     const i = ITEMS.find(x => x.id === id);
@@ -491,10 +510,9 @@
     const a = el.dataset.action;
     if (a === 'close') { closeModal(); return; }
     if (a === 'zone') { showZoneModal(el.dataset.layer); return; }
-    if (a === 'expiry-day') { STATE.expiryDay = +el.dataset.day; render(); return; }
-    if (a === 'expiry-all') { showExpiryModal(); return; }
     if (a === 'item') { showItemModal(el.dataset.id); return; }
     if (a === 'recipe') { showRecipeModal(el.dataset.id); return; }
+    if (a === 'recipe-next') { homeRecipeIndex += 1; render(); return; }
     if (a === 'dish-modal') { showDishModal(); return; }
     if (a === 'dish-quick') { showDishResult(el.dataset.q); return; }
     if (a === 'dish-submit') { const i = $('#dish-input'); showDishResult(i && i.value); return; }

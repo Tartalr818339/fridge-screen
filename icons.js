@@ -36,6 +36,7 @@
     sandwich: `<path d="M7 12l18 2-2 6-18-2z" fill="#F4D39A" stroke="#B98443" stroke-width="1.6"/><path d="M7 18l18 2-2 5-18-2z" fill="#DEA85F" stroke="#B98443" stroke-width="1.6"/><path d="M8 15l18 2" stroke="#3F8C3B" stroke-width="2.6"/><path d="M8 20l18 2" stroke="#F2B705" stroke-width="2.6"/>`,
     plate: `<circle cx="16" cy="17" r="10" fill="#F9FDFF" stroke="#9CBBA9" stroke-width="1.6"/><circle cx="16" cy="17" r="6.5" fill="#EAF7EF" stroke="#9CBBA9" stroke-width="1.6"/><path d="M4 13v8M28 13v8" stroke="#6FA88F" stroke-width="2" stroke-linecap="round"/>`,
     fridge: `<rect x="8" y="3" width="16" height="26" rx="4" fill="#F9FDFF" stroke="#5B93B8" stroke-width="1.6"/><path d="M8 12h16" stroke="#5B93B8" stroke-width="2"/><path d="M11 6v4M11 16v8" stroke="#3E86D6" stroke-width="2.4" stroke-linecap="round"/>`,
+    zone: `<rect x="6" y="5" width="20" height="22" rx="4" fill="#F9FDFF" stroke="#5B93B8" stroke-width="1.6"/><path d="M8 14h16M8 21h16" stroke="#5B93B8" stroke-width="1.6"/><circle cx="11.5" cy="11" r="2" fill="#F2B705"/><path d="M17 9h4v4h-4z" fill="#E84045"/><path d="M11 17h4v3h-4z" fill="#83C45F"/><path d="M18 17h3v3h-3z" fill="#F08052"/>`,
     snow: `<circle cx="16" cy="16" r="10" fill="#EEF7FD" stroke="#8CC6FF" stroke-width="1.6"/><path d="M16 6v20M7.5 11l17 10M24.5 11l-17 10" stroke="#2E86D6" stroke-width="2.4" stroke-linecap="round"/><path d="M13 9l3 3 3-3M13 23l3-3 3 3" stroke="#2E86D6" stroke-width="1.8" fill="none"/>`,
     leaf: `<path d="M26 6C13 6 7 11 7 19c0 4 3 7 7 7 8 0 12-8 12-20z" fill="#83C45F" stroke="#4F8E3B" stroke-width="1.6"/><path d="M9 25C13 17 18 12 25 8" stroke="#4F8E3B" stroke-width="2" fill="none"/><path d="M14 17l1-4M18 14l2-3" stroke="#4F8E3B" stroke-width="1.4" fill="none"/>`,
     camera: `<rect x="5" y="10" width="22" height="15" rx="4" fill="#EAF7EF" stroke="#4F8E3B" stroke-width="1.6"/><circle cx="16" cy="17.5" r="4.8" fill="#F9FDFF" stroke="#4F8E3B" stroke-width="1.6"/><circle cx="16" cy="17.5" r="2.2" fill="#3E86D6"/><path d="M11 10l2-3h6l2 3" fill="#EAF7EF" stroke="#4F8E3B" stroke-width="1.6"/>`,
@@ -94,6 +95,6 @@
   window.layerIcon = function (layer) {
     if (String(layer).includes('冷冻')) return wrap(ICON.snow);
     if (String(layer).includes('果蔬')) return wrap(ICON.leaf);
-    return wrap(ICON.fridge);
+    return wrap(ICON.zone);
   };
 })();

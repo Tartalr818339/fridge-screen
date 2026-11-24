@@ -52,11 +52,6 @@
   function currentModel() {
     return FRIDGE_MODELS.find(x => x.key === STATE.fridgeModel) || FRIDGE_MODELS[0];
   }
-  function layerIcon(layer) {
-    if (layer.includes('冷冻')) return '❄️';
-    if (layer === '果蔬抽屉') return '🥬';
-    return '🧊';
-  }
   function toast(msg) {
     const t = document.createElement('div');
     t.className = 'toast'; t.textContent = msg;
@@ -117,7 +112,7 @@
         </div>
       </div>
       <div class="visual-legend"><span><i class="dot green"></i>新鲜</span><span><i class="dot yellow"></i>2 天内</span><span><i class="dot red"></i>尽快吃</span></div>
-      <button class="model-line" data-action="model">🧊 ${esc(currentModel().name)} · ${layers.length} 个分区 <span>更换 ›</span></button>
+      <button class="model-line" data-action="model">${esc(currentModel().name)} · ${layers.length} 个分区 <span>更换 ›</span></button>
     </section>`;
   }
   function reminderPanel(list) {
@@ -127,7 +122,7 @@
         : i.remainingDays === 1 ? '明天到期，今天安排正好'
         : '还剩 2 天，优先吃掉';
       return `<div class="reminder-row" data-action="item" data-id="${i.id}">
-        <span class="reminder-emoji">${i.icon}</span>
+        <span class="reminder-emoji">${foodIcon(i.name, i.icon)}</span>
         <span class="reminder-copy"><b>${esc(i.name)}</b><small>${tip}</small></span>
         <span class="reminder-tag ${i.freshness}">${i.remainingDays === 0 ? '过期' : i.remainingDays + '天'}</span>
       </div>`;
@@ -206,14 +201,14 @@
         if (!its.length) return '';
         return `<div class="section"><h3 class="section-title">${layerIcon(layer)} ${esc(layer)} <span class="hint">${its.length} 件</span></h3>
           <div class="item-grid">${its.map(i => `<button class="item-card" data-action="item" data-id="${i.id}">
-            <div class="item-name">${i.icon} ${esc(i.name)} <span class="pill ${i.freshness}">${i.remainingDays === 0 ? '过期' : i.remainingDays + '天'}</span></div>
+            <div class="item-name">${foodIcon(i.name, i.icon)} ${esc(i.name)} <span class="pill ${i.freshness}">${i.remainingDays === 0 ? '过期' : i.remainingDays + '天'}</span></div>
             <div class="item-meta">${i.quantity}${esc(i.unit)} · 保质至 ${esc(i.expiryDate)}</div>
             <div class="item-bar"><i class="${i.freshness}" style="width:${i.freshPct}%"></i></div>
           </button>`).join('')}</div></div>`;
       }).join('') || '<div class="panel">没有找到匹配的食材</div>'}`;
   }
   function pageRecipes() {
-    return `<div class="page-head"><div><h1>今日食谱</h1><p>优先用掉快到期的食材</p></div><button class="btn btn-primary" data-action="dish-modal">🍳 今天吃什么</button></div>
+    return `<div class="page-head"><div><h1>今日食谱</h1><p>优先用掉快到期的食材</p></div><button class="btn btn-primary" data-action="dish-modal">${emojiIcon('🍳')} 今天吃什么</button></div>
       <div class="recipe-grid">${RECIPES.map(r => `<button class="recipe-card" data-action="recipe" data-id="${r.id}">
         <div class="recipe-thumb">${r.image ? `<img src="${r.image}" alt="${esc(r.name)}" loading="lazy" />` : r.emoji}</div>
         <div class="recipe-body"><h3>${esc(r.name)}</h3><p>⏱ ${r.minutes} 分钟 · ${r.ingredients.length} 样食材</p>
@@ -254,7 +249,7 @@
     const its = ITEMS.filter(i => i.layer === layer);
     openModal(modalHead(layerIcon(layer), layer, (LAYER_META[layer] || {}).temp + ' · 共 ' + its.length + ' 件') +
       `<div class="zone-detail-list">${its.map(i => `<div class="zone-detail-row">
-        <span class="zd-ico">${i.icon}</span><span class="zd-name">${esc(i.name)}</span>
+        <span class="zd-ico">${foodIcon(i.name, i.icon)}</span><span class="zd-name">${esc(i.name)}</span>
         <span class="zd-qty">${i.quantity}${esc(i.unit)}</span>
         <span class="zd-days ${i.freshness}">${i.remainingDays === 0 ? '已过期' : i.remainingDays + ' 天'}</span>
       </div>`).join('')}</div>` +
@@ -263,7 +258,7 @@
   function showItemModal(id) {
     const i = ITEMS.find(x => x.id === id);
     if (!i) return;
-    openModal(modalHead(i.icon, i.name, i.layer) +
+    openModal(modalHead(foodIcon(i.name, i.icon), i.name, i.layer) +
       `<div class="detail-row"><span>数量</span><b>${i.quantity}${esc(i.unit)}</b></div>
        <div class="detail-row"><span>保质期至</span><b>${esc(i.expiryDate)}</b></div>
        <div class="detail-row"><span>剩余</span><b>${i.remainingDays === 0 ? '已过期' : i.remainingDays + ' 天'}</b></div>
@@ -273,8 +268,8 @@
   function showRecipeModal(id) {
     const r = RECIPES.find(x => x.id === id);
     if (!r) return;
-    openModal(modalHead(r.emoji, r.name, r.minutes + ' 分钟') +
-      `<div class="detail-row"><span>食材</span><span>${r.ingredients.map(x => (x.have ? '✅ ' : '＋ ') + esc(x.name)).join(' · ')}</span></div>` +
+    openModal(modalHead(emojiIcon(r.emoji), r.name, r.minutes + ' 分钟') +
+      `<div class="detail-row"><span>食材</span><span>${r.ingredients.map(x => (x.have ? '✓ ' : '+ ') + esc(x.name)).join(' · ')}</span></div>` +
       r.steps.map((s, n) => `<div class="detail-row"><span>${n + 1}.</span><span>${esc(s)}</span></div>`).join('') +
       '<div class="modal-actions"><button class="btn btn-primary" data-action="close">完成</button></div>');
   }
@@ -295,7 +290,7 @@
     return { name: q, emoji: '🍽️', minutes: 15, ingredients: [], steps: genericSteps(q), custom: true };
   }
   function showDishModal() {
-    openModal(modalHead('🍳', '今天吃什么', '想吃什么就输入什么，冰箱食材只用来对照') +
+    openModal(modalHead(emojiIcon('🍳'), '今天吃什么', '想吃什么就输入什么，冰箱食材只用来对照') +
       `<div class="field"><input id="dish-input" placeholder="任意菜名，比如：麻辣香锅、奶油蘑菇汤" /></div>
        <div class="add-tabs">${['番茄炒蛋', '麻辣香锅', '豆腐汤'].map(x => `<button class="add-tab" data-action="dish-quick" data-q="${x}">${x}</button>`).join('')}</div>
        <div class="modal-actions"><button class="btn btn-ghost" data-action="close">取消</button><button class="btn btn-primary" data-action="dish-submit">看看怎么做</button></div>`);
@@ -307,7 +302,7 @@
     const dish = resolveDish(q);
     const have = dish.ingredients.filter(n => ITEMS.some(i => i.name === n));
     const need = dish.ingredients.filter(n => !ITEMS.some(i => i.name === n));
-    openModal(modalHead(dish.emoji, dish.name, dish.custom ? '按你想的菜整理好了，再对照冰箱' : '按菜名对照了冰箱食材') +
+    openModal(modalHead(emojiIcon(dish.emoji), dish.name, dish.custom ? '按你想的菜整理好了，再对照冰箱' : '按菜名对照了冰箱食材') +
       `<div class="detail-row"><span>用时</span><b>${dish.minutes} 分钟</b></div>
        <div class="detail-row"><span>冰箱已有</span><b>${have.length ? have.map(esc).join('、') : '没找到明确用料'}</b></div>
        <div class="detail-row"><span>建议补货</span><b>${need.length ? need.map(esc).join('、') : '暂时不用补'}</b></div>
@@ -349,24 +344,24 @@
   }
   function addPanelHtml() {
     if (addBatch) {
-      if (addMode === 'photo') return `<div class="photo-drop" id="photo-drop">📷 点击选择多张食材照片，一次识别多件</div><input type="file" id="add-photos" accept="image/*" multiple style="display:none" />`;
+      if (addMode === 'photo') return `<div class="photo-drop" id="photo-drop">${emojiIcon('📷')} 点击选择多张食材照片，一次识别多件</div><input type="file" id="add-photos" accept="image/*" multiple style="display:none" />`;
       return `<div class="field"><textarea id="add-batch-text" rows="6" placeholder="每行写一样：鸡蛋 6枚&#10;牛奶 2盒&#10;番茄 4个"></textarea></div>
         <button class="btn btn-ghost" data-action="add-parse">识别清单</button>`;
     }
-    if (addMode === 'manual') return `<div class="field"><label>食材名称</label><input id="m-name" placeholder="如：鸡蛋、牛奶" /><button class="mic-btn" data-action="voice-manual">🎤</button></div>
+    if (addMode === 'manual') return `<div class="field"><label>食材名称</label><input id="m-name" placeholder="如：鸡蛋、牛奶" /><button class="mic-btn" data-action="voice-manual">${emojiIcon('🎤')}</button></div>
       <div class="field"><label>所在分区</label><select id="m-layer">${currentLayers().map(l => `<option>${l}</option>`).join('')}</select></div>
       <div class="field"><label>数量 / 单位 / 保质天数</label><input id="m-qty" type="number" value="1" style="width:70px;display:inline-block" /><input id="m-unit" value="份" style="width:70px;display:inline-block" /><input id="m-days" type="number" value="7" style="width:70px;display:inline-block" /></div>`;
-    if (addMode === 'text') return `<div class="field"><input id="add-text" placeholder="例如：买了6个鸡蛋和2盒牛奶放冷藏" /><button class="mic-btn" data-action="voice-text">🎤</button></div>
+    if (addMode === 'text') return `<div class="field"><input id="add-text" placeholder="例如：买了6个鸡蛋和2盒牛奶放冷藏" /><button class="mic-btn" data-action="voice-text">${emojiIcon('🎤')}</button></div>
       <button class="btn btn-ghost" data-action="add-parse">识别食材</button>`;
-    return `<div class="photo-drop" id="photo-drop">📷 点击选择食材照片</div><input type="file" id="add-photo" accept="image/*" style="display:none" />`;
+    return `<div class="photo-drop" id="photo-drop">${emojiIcon('📷')} 点击选择食材照片</div><input type="file" id="add-photo" accept="image/*" style="display:none" />`;
   }
   function bindAddPanel() {
     const drop = $('#photo-drop');
     if (drop) drop.onclick = () => { const f = $(addBatch ? '#add-photos' : '#add-photo'); if (f) f.click(); };
     const file = $('#add-photo');
-    if (file) file.onchange = () => { file.dataset.ready = '1'; drop.textContent = '✅ 已识别：全脂牛奶 1盒 · 吐司面包 1袋'; };
+    if (file) file.onchange = () => { file.dataset.ready = '1'; drop.innerHTML = `${emojiIcon('✅')} 已识别：全脂牛奶 1盒 · 吐司面包 1袋`; };
     const files = $('#add-photos');
-    if (files) files.onchange = () => { files.dataset.ready = '1'; drop.textContent = '✅ 已识别 3 样食材：鲜鸡蛋 / 全脂牛奶 / 番茄'; };
+    if (files) files.onchange = () => { files.dataset.ready = '1'; drop.innerHTML = `${emojiIcon('✅')} 已识别 3 样食材：鲜鸡蛋 / 全脂牛奶 / 番茄`; };
   }
   function renderAddPanel() {
     const panel = $('#add-panel'); if (!panel) return;
@@ -379,10 +374,10 @@
   }
   function showAddModal(mode) {
     addMode = mode || 'photo'; addBatch = false;
-    openModal(modalHead('🧺', '录入食材', '拍照 / 手动 / 一句话，都支持单件或批量') +
-      `<div class="add-tabs"><button class="add-tab" data-action="add-tab" data-mode="photo">📷 拍照</button>
-        <button class="add-tab" data-action="add-tab" data-mode="manual">✍️ 手动</button>
-        <button class="add-tab" data-action="add-tab" data-mode="text">💬 一句话</button></div>
+    openModal(modalHead(emojiIcon('🧺'), '录入食材', '拍照 / 手动 / 一句话，都支持单件或批量') +
+      `<div class="add-tabs"><button class="add-tab" data-action="add-tab" data-mode="photo">${emojiIcon('📷')} 拍照</button>
+        <button class="add-tab" data-action="add-tab" data-mode="manual">${emojiIcon('✍️')} 手动</button>
+        <button class="add-tab" data-action="add-tab" data-mode="text">${emojiIcon('💬')} 一句话</button></div>
        <div class="batch-toggle"><button class="batch-seg" data-action="add-batch" data-batch="single">单件</button><button class="batch-seg" data-action="add-batch" data-batch="batch">批量</button></div>
        <div id="add-panel"></div>
        <div class="modal-actions"><button class="btn btn-ghost" data-action="close">取消</button><button class="btn btn-primary" data-action="add-confirm">确认添加</button></div>`);
@@ -450,9 +445,9 @@
     try { rec.start(); } catch (e) { toast('语音识别启动失败'); }
   }
   function showModelModal() {
-    openModal(modalHead('🧊', '冰箱型号', '不同冰箱的分区结构不同，可按实际情况选择') +
+    openModal(modalHead(emojiIcon('🧊'), '冰箱型号', '不同冰箱的分区结构不同，可按实际情况选择') +
       FRIDGE_MODELS.map(m => `<button class="model-option ${m.key === STATE.fridgeModel ? 'active' : ''}" data-action="choose-model" data-model="${m.key}"><b>${m.name}</b><span>${m.layers.join(' / ')}</span></button>`).join('') +
-      '<label class="photo-drop" for="model-photo">📷 拍照识别冰箱分区</label><input type="file" id="model-photo" accept="image/*" style="display:none" />');
+      `<label class="photo-drop" for="model-photo">${emojiIcon('📷')} 拍照识别冰箱分区</label><input type="file" id="model-photo" accept="image/*" style="display:none" />`);
     const f = $('#model-photo');
     if (f) f.onchange = () => { closeModal(); applyModel('multi'); toast('已识别：多门冰箱，冷冻区分上 / 中 / 下三层'); };
   }
@@ -468,7 +463,7 @@
     STATE.fridgeModel = key; closeModal(); render(); toast('已切换为' + m.name);
   }
   function showPairModal() {
-    openModal(modalHead('📡', '碰一碰配对', '让手机与冰箱屏保持同步') +
+    openModal(modalHead(emojiIcon('📡'), '碰一碰配对', '让手机与冰箱屏保持同步') +
       [['1', '打开冰箱屏电源键'], ['2', '屏幕显示配对二维码'], ['3', '手机靠近冰箱 NFC 感应区'], ['4', '食材与提醒自动同步']].map(s => `<div class="detail-row"><span>${s[0]}</span><span>${s[1]}</span></div>`).join('') +
       '<div class="modal-actions"><button class="btn btn-primary" data-action="close">完成</button></div>');
   }

@@ -64,8 +64,7 @@
   }
   function renderNav() {
     const page = STATE.appPage;
-    nav.innerHTML = TABS.map(t => `<button class="nav-btn ${page === t.key ? 'active' : ''}" data-nav="${t.key}"><span class="nav-ico">${t.icon}</span><span>${t.label}</span></button>`).join('') +
-      '<div class="nav-foot">碰一碰同步<br/>食材实时可见</div>';
+    nav.innerHTML = TABS.map(t => `<button class="nav-btn ${page === t.key ? 'active' : ''}" data-nav="${t.key}"><span class="nav-ico">${t.icon}</span><span>${t.label}</span></button>`).join('');
   }
   function render() {
     const p = STATE.appPage;
@@ -182,14 +181,13 @@
     const urgent = urgentItems();
     return `<div class="page-head home-head">
       <div><h1>冰箱里有什么</h1><p>${ITEMS.length} 件食材 · ${layers.length} 个分区 · 刚刚同步</p></div>
-      <button class="btn btn-primary" data-action="add-open">＋ 录入食材</button>
     </div>
     <div class="home-grid">
-      ${homeVisual()}
       <div class="home-side">
         ${reminderPanel(urgent)}
         ${recipePanel(urgent)}
       </div>
+      ${homeVisual()}
     </div>`;
   }
   function pageFridge() {

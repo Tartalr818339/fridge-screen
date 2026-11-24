@@ -331,7 +331,9 @@ button{cursor:pointer}
 .reminder-panel .panel-head,.recipe-spotlight .panel-head{margin-bottom:9px}
 .reminder-row{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:12px;background:#F8FCF9;margin-bottom:7px;cursor:pointer;border:1px solid transparent}
 .reminder-row:hover{border-color:#CAE3D3}
-.reminder-row.soft{background:#FFF9E9;cursor:default}
+.reminder-row.soft{background:#FFF6DF;border-color:#F0DCA8;border-left:3px solid #F2B705;cursor:default}
+.restock-flag{display:inline-flex;align-items:center;gap:3px;margin-left:6px;padding:2px 7px;border-radius:99px;background:#FFF0C9;color:#9A7000;font-size:11px;font-style:normal;font-weight:800;vertical-align:middle}
+.restock-flag .food-ico{width:14px;height:14px;vertical-align:middle}
 .reminder-emoji{width:32px;height:32px;border-radius:10px;background:#EEF6F1;display:grid;place-items:center;font-size:17px;flex:none}
 .reminder-copy{flex:1;min-width:0}
 .reminder-copy b{display:block;font-size:15px;color:#153B28}

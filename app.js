@@ -129,8 +129,8 @@
     }).join('');
     const restock = STATE.restock.find(r => r.status === '待补');
     const restockRow = restock ? `<div class="reminder-row soft">
-      <span class="reminder-emoji">🛒</span>
-      <span class="reminder-copy"><b>${esc(restock.name)}</b><small>常买清单里还缺，顺手补上吧</small></span>
+      <span class="reminder-emoji">${foodIcon(restock.name, restock.icon || '')}</span>
+      <span class="reminder-copy"><b>${esc(restock.name)} <em class="restock-flag">${emojiIcon('🛒')} 待补货</em></b><small>常买清单里还缺，顺手补上吧</small></span>
       <button class="mini-btn" data-action="add-restock" data-name="${esc(restock.name)}">加入补货</button>
     </div>` : '';
     const empty = !rows && !restockRow ? '<div class="empty-note">最近没有需要操心的事，冰箱状态很好</div>' : '';

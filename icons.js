@@ -44,7 +44,8 @@
     basket: `<path d="M6 14h20l-2 12H8z" fill="#F4D39A" stroke="#B98443" stroke-width="1.6"/><path d="M11 14l5-7 5 7" stroke="#B98443" stroke-width="2" fill="none"/><path d="M11 19h10" stroke="#B98443" stroke-width="1.6"/>`,
     nfc: `<rect x="6" y="5" width="20" height="22" rx="5" fill="#EAF7EF" stroke="#4F8E3B" stroke-width="1.6"/><path d="M11 12a7 7 0 0 1 0 8M15 12a11 11 0 0 1 0 8M19 12a15 15 0 0 1 0 8" stroke="#3E86D6" stroke-width="2" stroke-linecap="round" fill="none"/>`,
     check: `<circle cx="16" cy="16" r="11" fill="#1DB954"/><path d="M10 16.5l4 4 8-9" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
-    mic: `<rect x="12" y="5" width="8" height="14" rx="4" fill="#EAF7EF" stroke="#4F8E3B" stroke-width="1.6"/><path d="M9 15a7 7 0 0 0 14 0M16 22v5M12 27h8" stroke="#4F8E3B" stroke-width="2" stroke-linecap="round" fill="none"/>`
+    mic: `<rect x="12" y="5" width="8" height="14" rx="4" fill="#EAF7EF" stroke="#4F8E3B" stroke-width="1.6"/><path d="M9 15a7 7 0 0 0 14 0M16 22v5M12 27h8" stroke="#4F8E3B" stroke-width="2" stroke-linecap="round" fill="none"/>`,
+    cart: `<path d="M4 7h3.5l2.5 12h13l2.5-9H9" fill="none" stroke="#B98443" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="24" r="2" fill="#B98443"/><circle cx="22" cy="24" r="2" fill="#B98443"/><path d="M11 12h13" stroke="#E4B36A" stroke-width="1.6" stroke-linecap="round"/>`
   };
 
   const ALIAS = {
@@ -73,7 +74,7 @@
     '可乐': 'cola', '🥤': 'cola', '糖': 'sugar', '🍬': 'sugar', '米饭': 'rice', '🍚': 'rice', '燕麦': 'oat', '🌾': 'oat',
     '🍳': 'pan', '🍲': 'soup', '🍜': 'soup', '🥗': 'salad', '🥪': 'sandwich', '🍽️': 'plate', '🍽': 'plate',
     '🧊': 'fridge', '❄️': 'snow', '❄': 'snow',
-    '📷': 'camera', '✍️': 'pen', '✍': 'pen', '💬': 'chat', '🧺': 'basket', '📡': 'nfc', '✅': 'check', '✔': 'check', '🎤': 'mic'
+    '📷': 'camera', '✍️': 'pen', '✍': 'pen', '💬': 'chat', '🧺': 'basket', '📡': 'nfc', '✅': 'check', '✔': 'check', '🎤': 'mic', '🛒': 'cart'
   };
 
   function wrap(body) {

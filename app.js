@@ -530,17 +530,22 @@
     }
     if (a === 'restock-add') {
       const picked = STATE.restock.filter(r => STATE.checked.has(r.id) && r.status === '待补');
-      const skuFor = PRODUCT_MAPPING && Object.keys(PRODUCT_MAPPING).find(k => PRODUCT_MAPPING[k] === picked[0]?.name);
-      picked.forEach(r => { const sku = Object.keys(PRODUCT_MAPPING).find(k => PRODUCT_MAPPING[k] === r.name); if (sku) addToCart(sku, r.id); });
-      render(); toast(picked.length ? `已加购 ${picked.length} 项` : '请先勾选食材'); return;
+      let added = 0;
+      picked.forEach(r => { const sku = Object.keys(PRODUCT_MAPPING).find(k => PRODUCT_MAPPING[k] === r.name); if (sku) { addToCart(sku, r.id); added += 1; } });
+      render();
+      if (added) showCartModal(); else toast('请先勾选可加购的食材');
+      return;
     }
     if (a === 'auto-manual') { closeModal(); toast('已保留在补货清单'); return; }
     if (a === 'auto-order') {
+      let added = 0;
       STATE.restock.filter(r => r.status === '待补').slice(0, 3).forEach(r => {
         const sku = Object.keys(PRODUCT_MAPPING).find(k => PRODUCT_MAPPING[k] === r.name);
-        if (sku) addToCart(sku, r.id);
+        if (sku) { addToCart(sku, r.id); added += 1; }
       });
-      closeModal(); render(); toast('已自动加购 3 样食材'); return;
+      closeModal(); render();
+      if (added) showCartModal(); else toast('暂无可自动加购的食材');
+      return;
     }
     if (a === 'cart-open') { showCartModal(); return; }
     if (a === 'cart-qty') { const c = STATE.cart[+el.dataset.idx]; if (c) c.qty += 1; showCartModal(); return; }

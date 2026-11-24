@@ -201,7 +201,7 @@
         if (!its.length) return '';
         return `<div class="section"><h3 class="section-title">${layerIcon(layer)} ${esc(layer)} <span class="hint">${its.length} 件</span></h3>
           <div class="item-grid">${its.map(i => `<button class="item-card" data-action="item" data-id="${i.id}">
-            <div class="item-name">${foodIcon(i.name, i.icon)} ${esc(i.name)} <span class="pill ${i.freshness}">${i.remainingDays === 0 ? '过期' : i.remainingDays + '天'}</span></div>
+            <div class="item-name"><span class="ico-badge">${foodIcon(i.name, i.icon)}</span>${esc(i.name)} <span class="pill ${i.freshness}">${i.remainingDays === 0 ? '过期' : i.remainingDays + '天'}</span></div>
             <div class="item-meta">${i.quantity}${esc(i.unit)} · 保质至 ${esc(i.expiryDate)}</div>
             <div class="item-bar"><i class="${i.freshness}" style="width:${i.freshPct}%"></i></div>
           </button>`).join('')}</div></div>`;

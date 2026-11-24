@@ -358,16 +358,20 @@ button{cursor:pointer}
 .dish-entry:hover{color:#0E7C3A;border-color:#8FD3A6}
 
 /* 专属写实小图标 */
-.food-ico{width:1.25em;height:1.25em;display:inline-block;vertical-align:-.25em;flex:none}
-.item-name .food-ico{width:1.35em;height:1.35em;vertical-align:-.3em;margin-right:2px}
-.section-title .food-ico{width:1.2em;height:1.2em;vertical-align:-.25em;margin-right:4px}
-.reminder-emoji .food-ico{width:22px;height:22px;vertical-align:middle}
-.modal-icon .food-ico{width:26px;height:26px;vertical-align:middle}
+.food-ico{width:20px;height:20px;display:inline-block;vertical-align:-.3em;flex:none}
+.ico-badge{width:38px;height:38px;border-radius:12px;background:#EAF7EF;border:1px solid #CFE7D8;display:grid;place-items:center;flex:none;box-shadow:0 2px 6px rgba(18,80,45,.06)}
+.ico-badge .food-ico{width:27px;height:27px;vertical-align:middle}
+.item-name{gap:9px}
+.section-title .food-ico{width:20px;height:20px;vertical-align:-.35em;margin-right:5px}
+.reminder-emoji{width:38px;height:38px;background:#EAF7EF;border:1px solid #CFE7D8}
+.reminder-emoji .food-ico{width:27px;height:27px;vertical-align:middle}
+.modal-icon .food-ico{width:30px;height:30px;vertical-align:middle}
+.zd-ico{width:44px;height:44px;border-radius:12px;background:#EAF7EF;display:grid;place-items:center}
 .zd-ico .food-ico{width:32px;height:32px;vertical-align:middle}
-.btn .food-ico{width:18px;height:18px;vertical-align:-4px;margin-right:4px}
-.photo-drop .food-ico{width:20px;height:20px;vertical-align:-5px;margin-right:4px}
-.add-tab .food-ico{width:18px;height:18px;vertical-align:-4px;margin-right:4px}
-.mic-btn .food-ico{width:22px;height:22px;vertical-align:middle}
+.btn .food-ico{width:20px;height:20px;vertical-align:-4px;margin-right:5px}
+.photo-drop .food-ico{width:22px;height:22px;vertical-align:-5px;margin-right:5px}
+.add-tab .food-ico{width:20px;height:20px;vertical-align:-4px;margin-right:5px}
+.mic-btn .food-ico{width:24px;height:24px;vertical-align:middle}
 
 @media(max-width:900px){
   .stage{padding:0}

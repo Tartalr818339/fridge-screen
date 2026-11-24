@@ -327,11 +327,11 @@ button{cursor:pointer}
 .model-line{display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:14px;padding:12px 13px;border:1px solid var(--line);border-radius:10px;background:#F7FBF8;color:#153B28;font-size:13px;font-weight:700;text-align:left}
 .model-line span{color:#0E7C3A}
 
-.reminder-panel .panel-head,.recipe-spotlight .panel-head{margin-bottom:10px}
-.reminder-row{display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:12px;background:#F8FCF9;margin-bottom:8px;cursor:pointer;border:1px solid transparent}
+.reminder-panel .panel-head,.recipe-spotlight .panel-head{margin-bottom:9px}
+.reminder-row{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:12px;background:#F8FCF9;margin-bottom:7px;cursor:pointer;border:1px solid transparent}
 .reminder-row:hover{border-color:#CAE3D3}
 .reminder-row.soft{background:#FFF9E9;cursor:default}
-.reminder-emoji{width:34px;height:34px;border-radius:10px;background:#EEF6F1;display:grid;place-items:center;font-size:18px;flex:none}
+.reminder-emoji{width:32px;height:32px;border-radius:10px;background:#EEF6F1;display:grid;place-items:center;font-size:17px;flex:none}
 .reminder-copy{flex:1;min-width:0}
 .reminder-copy b{display:block;font-size:15px;color:#153B28}
 .reminder-copy small{display:block;font-size:12px;color:#5F7C6B;margin-top:2px;line-height:1.4}

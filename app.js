@@ -121,7 +121,8 @@
     </section>`;
   }
   function reminderPanel(list) {
-    const rows = list.slice(0, 2).map(i => {
+    const hasRestock = STATE.restock.some(r => r.status === '待补');
+    const rows = list.slice(0, hasRestock ? 3 : 4).map(i => {
       const tip = i.remainingDays === 0 ? '已过期，建议尽快处理'
         : i.remainingDays === 1 ? '明天到期，今天安排正好'
         : '还剩 2 天，优先吃掉';

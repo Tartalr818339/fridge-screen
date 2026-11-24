@@ -110,7 +110,8 @@ button{cursor:pointer}
 .recipe-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .recipe-card{border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#fff;text-align:left;padding:0;transition:.18s}
 .recipe-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(18,61,40,.1)}
-.recipe-thumb{height:92px;padding:14px;color:#fff;display:flex;align-items:flex-end;font-size:30px}
+.recipe-thumb{height:92px;overflow:hidden;position:relative;background:#EAF7EF;display:flex;align-items:flex-end;font-size:30px}
+.recipe-thumb img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block;transform:scale(1.18);transform-origin:center 35%}
 .recipe-body{padding:12px}
 .recipe-body h3{margin:0 0 5px;font-size:15px}
 .recipe-body p{margin:0;font-size:12px;color:var(--muted)}
@@ -344,7 +345,8 @@ button{cursor:pointer}
 
 .spotlight-main{display:flex;align-items:center;gap:12px;width:100%;border:0;background:#F8FCF9;border-radius:13px;padding:10px;text-align:left;color:inherit}
 .spotlight-main:hover{background:#F1F8F3}
-.spotlight-thumb{width:62px;height:62px;border-radius:12px;display:grid;place-items:center;font-size:28px;flex:none;filter:saturate(.9)}
+.spotlight-thumb{width:62px;height:62px;border-radius:12px;overflow:hidden;position:relative;display:grid;place-items:center;font-size:28px;flex:none;background:#EAF7EF}
+.spotlight-thumb img{width:100%;height:100%;object-fit:cover;object-position:center 35%;display:block;transform:scale(1.18);transform-origin:center 35%}
 .spotlight-copy{flex:1;min-width:0}
 .spotlight-copy b{display:block;font-size:16px;color:#153B28}
 .spotlight-copy small{display:block;font-size:12px;color:#5F7C6B;margin-top:3px}

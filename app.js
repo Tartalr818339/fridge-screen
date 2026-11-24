@@ -166,7 +166,7 @@
     return `<section class="panel recipe-spotlight">
       <div class="panel-head"><h2>今日推荐</h2><button class="link-btn" data-action="recipe-next">换一道 ›</button></div>
       <button class="spotlight-main" data-action="recipe" data-id="${r.id}">
-        <span class="spotlight-thumb" style="background:${r.thumb}">${r.emoji}</span>
+        <span class="spotlight-thumb">${r.image ? `<img src="${r.image}" alt="" loading="lazy" />` : r.emoji}</span>
         <span class="spotlight-copy">
           <b>${esc(r.name)}</b>
           <small>⏱ ${r.minutes} 分钟 · ${r.ingredients.length} 样食材</small>
@@ -215,7 +215,7 @@
   function pageRecipes() {
     return `<div class="page-head"><div><h1>今日食谱</h1><p>优先用掉快到期的食材</p></div><button class="btn btn-primary" data-action="dish-modal">🍳 今天吃什么</button></div>
       <div class="recipe-grid">${RECIPES.map(r => `<button class="recipe-card" data-action="recipe" data-id="${r.id}">
-        <div class="recipe-thumb" style="background:${r.thumb}">${r.emoji}</div>
+        <div class="recipe-thumb">${r.image ? `<img src="${r.image}" alt="${esc(r.name)}" loading="lazy" />` : r.emoji}</div>
         <div class="recipe-body"><h3>${esc(r.name)}</h3><p>⏱ ${r.minutes} 分钟 · ${r.ingredients.length} 样食材</p>
         ${r.expiring.length ? `<div class="recipe-tip">能用掉快到期的：${r.expiring.map(esc).join('、')}</div>` : ''}</div>
       </button>`).join('')}</div>`;

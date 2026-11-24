@@ -7,12 +7,13 @@
   const modalRoot = $('#modal-root');
   const toastRoot = $('#toast-root');
 
+  const ico = path => `<svg viewBox="0 0 24 24" fill-rule="evenodd" aria-hidden="true" focusable="false">${path}</svg>`;
   const TABS = [
-    { key: 'home', icon: '⌂', label: '总览' },
-    { key: 'fridge', icon: '▦', label: '食材' },
-    { key: 'recipes', icon: '◔', label: '食谱' },
-    { key: 'restock', icon: '⌘', label: '补货' },
-    { key: 'device', icon: '⚙', label: '设置' }
+    { key: 'home', icon: ico('<path d="M12 2 2 11h3v10h6v-6h2v6h6V11h3L12 2z"/>'), label: '总览' },
+    { key: 'fridge', icon: ico('<path d="M5 2h14a2 2 0 0 1 2 2v5H3V4a2 2 0 0 1 2-2zm0 9h14v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z"/>'), label: '食材' },
+    { key: 'recipes', icon: ico('<path d="M3 11h18a1 1 0 0 1 1 1c0 4.4-4.5 8-10 8S2 16.4 2 12a1 1 0 0 1 1-1zm5-8h2v7H8V3zm4 0h2v7h-2V3z"/>'), label: '食谱' },
+    { key: 'restock', icon: ico('<path d="M2 3h2.6l1 3.5h14.1l-2.3 8.5H7.2L6.5 18h11.8v2H5.2a2 2 0 0 1-2-2L2 3zm4.5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm9.5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>'), label: '补货' },
+    { key: 'device', icon: ico('<path d="M19.4 13a7.8 7.8 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.4a7.6 7.6 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.8 7.8 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.6 7.6 0 0 0 1.7 1l.4 2.4h4l.4-2.4a7.6 7.6 0 0 0 1.7-1l2.5 1 2-3.5L19.4 13zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/>'), label: '设置' }
   ];
 
   const FOOD_DICT = [

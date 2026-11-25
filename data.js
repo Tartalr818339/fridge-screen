@@ -108,7 +108,13 @@ const RECIPES = [
       { name: '全脂牛奶', have: true }, { name: '鲜鸡蛋', have: true }, { name: '糖', have: false }
     ],
     expiring: ['全脂牛奶', '鲜鸡蛋'],
-    steps: ['鸡蛋加糖打散，倒入温牛奶搅匀。', '过筛后盖上保鲜膜。', '中小火蒸 15 分钟，静置 2 分钟即可。'] }
+    steps: ['鸡蛋加糖打散，倒入温牛奶搅匀。', '过筛后盖上保鲜膜。', '中小火蒸 15 分钟，静置 2 分钟即可。'] },
+  { id: 'rc-08', name: '香煎鸡胸时蔬', emoji: '🍗', image: './assets/recipes/chicken-breast.svg', minutes: 18, thumb: 'linear-gradient(135deg,#F2C0A8,#DFA78F)',
+    ingredients: [
+      { name: '鸡胸肉', have: true }, { name: '西兰花', have: true }, { name: '番茄', have: true }
+    ],
+    expiring: ['鸡胸肉'],
+    steps: ['鸡胸肉切片，用盐和黑胡椒腌制 10 分钟。', '西兰花焯水，番茄切块。', '平底锅煎熟鸡胸，放入时蔬翻炒均匀即可。'] }
 ];
 
 // 配菜菜品库：含菜名、常见食材与分类标签

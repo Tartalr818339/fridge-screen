@@ -184,25 +184,36 @@
       ${homeVisual()}
     </div>`;
   }
-  function pageFridge() {
+  function fridgeResultHtml() {
     const layers = currentLayers();
     const shownLayers = filterLayer === 'all' ? layers : layers.filter(l => l === filterLayer);
-    let items = ITEMS.filter(i => (filterLayer === 'all' || i.layer === filterLayer) && (!query || i.name.includes(query)));
+    const q = query.trim();
+    const matches = item => {
+      if (!q) return true;
+      if (item.name.includes(q)) return true;
+      const catalog = FOOD_DICT.find(p => p.name === item.name);
+      return !!(catalog && (catalog.alias || []).some(a => a.includes(q)));
+    };
+    const items = ITEMS.filter(i => (filterLayer === 'all' || i.layer === filterLayer) && matches(i));
+    return shownLayers.map(layer => {
+      const its = items.filter(i => i.layer === layer);
+      if (!its.length) return '';
+      return `<div class="section"><h3 class="section-title">${layerIcon(layer)} ${esc(layer)} <span class="hint">${its.length} 件</span></h3>
+        <div class="item-grid">${its.map(i => `<button class="item-card" data-action="item" data-id="${i.id}">
+          <div class="item-name"><span class="ico-badge">${foodIcon(i.name, i.icon)}</span>${esc(i.name)} <span class="pill ${i.freshness}">${i.remainingDays === 0 ? '过期' : i.remainingDays + '天'}</span></div>
+          <div class="item-meta">${i.quantity}${esc(i.unit)} · 保质至 ${esc(i.expiryDate)}</div>
+          <div class="item-bar"><i class="${i.freshness}" style="width:${i.freshPct}%"></i></div>
+        </button>`).join('')}</div></div>`;
+    }).join('') || '<div class="panel">没有找到匹配的食材</div>';
+  }
+  function pageFridge() {
+    const layers = currentLayers();
     return `<div class="page-head"><div><h1>冰箱食材</h1><p>共 ${ITEMS.length} 件 · ${layers.length} 个分区 · 实时同步</p></div><button class="btn btn-primary" data-action="add-open">＋ 录入食材</button></div>
       <div class="toolbar"><input id="search" class="search" placeholder="搜索食材名称" value="${esc(query)}" />
         <button class="chip ${filterLayer === 'all' ? 'active' : ''}" data-filter="all">全部分区</button>
         ${layers.map(l => `<button class="chip ${filterLayer === l ? 'active' : ''}" data-filter="${esc(l)}">${esc(l)}</button>`).join('')}
       </div>
-      ${shownLayers.map(layer => {
-        const its = items.filter(i => i.layer === layer);
-        if (!its.length) return '';
-        return `<div class="section"><h3 class="section-title">${layerIcon(layer)} ${esc(layer)} <span class="hint">${its.length} 件</span></h3>
-          <div class="item-grid">${its.map(i => `<button class="item-card" data-action="item" data-id="${i.id}">
-            <div class="item-name"><span class="ico-badge">${foodIcon(i.name, i.icon)}</span>${esc(i.name)} <span class="pill ${i.freshness}">${i.remainingDays === 0 ? '过期' : i.remainingDays + '天'}</span></div>
-            <div class="item-meta">${i.quantity}${esc(i.unit)} · 保质至 ${esc(i.expiryDate)}</div>
-            <div class="item-bar"><i class="${i.freshness}" style="width:${i.freshPct}%"></i></div>
-          </button>`).join('')}</div></div>`;
-      }).join('') || '<div class="panel">没有找到匹配的食材</div>'}`;
+      <div id="fridge-results">${fridgeResultHtml()}</div>`;
   }
   function pageRecipes() {
     return `<div class="page-head"><div><h1>今日食谱</h1><p>优先用掉快到期的食材</p></div><button class="btn btn-primary" data-action="dish-modal">${emojiIcon('🍳')} 今天吃什么</button></div>
@@ -591,8 +602,9 @@
   });
   document.addEventListener('input', e => {
     if (e.target.id === 'search') {
-      query = e.target.value.trim(); render();
-      const el = $('#search'); if (el) { el.focus(); el.setSelectionRange(query.length, query.length); }
+      query = e.target.value.trim();
+      const box = $('#fridge-results');
+      if (box) box.innerHTML = fridgeResultHtml();
     }
   });
   render();

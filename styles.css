@@ -167,11 +167,19 @@ button{cursor:pointer}
 .field label{display:block;font-size:13px;font-weight:700;margin-bottom:5px}
 .field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;outline:none;background:#fff}
 .field input:focus,.field textarea:focus{border-color:var(--green)}
-.mic-btn{border:0;border-radius:10px;background:var(--soft);color:var(--deep);font-size:18px;min-height:44px;padding:0 13px;margin-left:6px}
+.voice-card{border:1px solid var(--line);border-radius:14px;background:#F8FCF9;padding:12px;margin-bottom:12px}
+.voice-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.voice-card-title{font-size:13px;font-weight:800;color:var(--ink)}
+.voice-example{border:0;border-radius:99px;background:#E8F7EE;color:var(--deep);font-size:12px;font-weight:800;padding:5px 10px}
+.voice-input-row{display:flex;align-items:center;gap:8px}
+.voice-input-row input{flex:1;min-width:0;width:auto}
+.mic-btn{border:0;border-radius:10px;background:var(--soft);color:var(--deep);font-size:18px;min-height:44px;min-width:46px;padding:0 13px;flex:none}
 .mic-btn svg{width:22px;height:22px;vertical-align:middle;fill:currentColor}
 .mic-btn.listening{background:var(--red-soft);color:var(--red);animation:pulse 1s infinite}
-.voice-status{margin:-2px 0 11px;padding:8px 10px;border-radius:9px;background:#F4F8F5;color:#6B7C72;font-size:12px;line-height:1.5}
+.voice-status{display:flex;align-items:center;gap:7px;margin:9px 0 0;padding:8px 10px;border-radius:9px;background:#EEF5F0;color:#6B7C72;font-size:12px;line-height:1.5}
 .voice-status[data-live]{background:#EAF7EF;color:#0E7C3A;font-weight:700}
+.voice-dot{width:7px;height:7px;border-radius:50%;background:#B7CBBE;flex:none}
+.voice-status[data-live] .voice-dot{background:var(--green);box-shadow:0 0 0 4px rgba(29,185,84,.12)}
 @keyframes pulse{50%{opacity:.55}}
 .model-option{display:block;width:100%;text-align:left;border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:8px;background:#fff}
 .model-option.active{border-color:var(--green);background:var(--soft)}

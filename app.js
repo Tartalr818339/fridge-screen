@@ -389,16 +389,20 @@
   function addPanelHtml() {
     if (addBatch) {
       return `<div class="field"><textarea id="add-batch-text" rows="6" placeholder="每行写一样：鸡蛋 6枚&#10;牛奶 2盒&#10;番茄 4个"></textarea></div>
-        <div class="voice-status">也可以直接说一句话，系统会自动拆成多行</div>
+        <div class="voice-status"><i class="voice-dot"></i><span class="voice-status-text">每行写一样，例如“6个鸡蛋”</span></div>
         <button class="btn btn-ghost" data-action="add-parse">识别清单</button>`;
     }
-    if (addMode === 'manual') return `<div class="field"><label>食材名称</label><input id="m-name" placeholder="说出或直接输入食材名称" /><button class="mic-btn" data-action="voice-manual" aria-label="语音输入食材名称">${ico(MIC_ICON)}</button></div>
-      <div id="voice-status" class="voice-status">点击麦克风说出食材名称，例如“鸡蛋”</div>
+    if (addMode === 'manual') return `<div class="field"><label>食材名称</label>
+        <div class="voice-input-row"><input id="m-name" placeholder="说出或直接输入食材名称" /><button class="mic-btn" data-action="voice-manual" aria-label="语音输入食材名称">${ico(MIC_ICON)}</button></div>
+      </div>
+      <div id="voice-status" class="voice-status"><i class="voice-dot"></i><span class="voice-status-text">点击麦克风说出食材名称，例如“鸡蛋”</span></div>
       <div class="field"><label>所在分区</label><select id="m-layer">${currentLayers().map(l => `<option>${l}</option>`).join('')}</select></div>
       <div class="field"><label>数量 / 单位 / 保质天数</label><input id="m-qty" type="number" value="1" style="width:70px;display:inline-block" /><input id="m-unit" value="份" style="width:70px;display:inline-block" /><input id="m-days" type="number" value="7" style="width:70px;display:inline-block" /></div>`;
-    return `<div class="field"><label>一句话录入</label><input id="add-text" placeholder="例如：买了6个鸡蛋和2盒牛奶放冷藏" /><button class="mic-btn" data-action="voice-text" aria-label="语音识别食材">${ico(MIC_ICON)}</button></div>
-      <div id="voice-status" class="voice-status">点击麦克风说出食材，例如“6个鸡蛋和2盒牛奶”</div>
-      <button class="btn btn-ghost" data-action="add-parse">识别食材</button>`;
+    return `<div class="voice-card">
+      <div class="voice-card-head"><span class="voice-card-title">一句话录入</span><button class="voice-example" data-action="voice-example">填入示例</button></div>
+      <div class="voice-input-row"><input id="add-text" placeholder="例如：买了6个鸡蛋和2盒牛奶放冷藏" /><button class="mic-btn" data-action="voice-text" aria-label="语音识别食材">${ico(MIC_ICON)}</button></div>
+      <div id="voice-status" class="voice-status"><i class="voice-dot"></i><span class="voice-status-text">点击麦克风说出食材，例如“6个鸡蛋和2盒牛奶”</span></div>
+    </div>`;
   }
   function renderAddPanel() {
     stopVoice();
@@ -450,7 +454,8 @@
     if (voiceRecognition) { try { voiceRecognition.stop(); } catch (e) {} voiceRecognition = null; }
     $$('.mic-btn').forEach(b => b.classList.remove('listening'));
     const status = $('#voice-status');
-    if (status && status.dataset.live) status.textContent = '已停止识别，可重新点击麦克风';
+    const text = status && status.querySelector('.voice-status-text');
+    if (status && text && status.dataset.live) text.textContent = '已停止识别，可重新点击麦克风';
   }
   function startVoice(type) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -461,7 +466,8 @@
     let finalText = '';
     const setStatus = text => {
       const s = $('#voice-status');
-      if (s) { s.dataset.live = '1'; s.textContent = text; }
+      const t = s && s.querySelector('.voice-status-text');
+      if (s && t) { s.dataset.live = '1'; t.textContent = text; }
     };
     rec.onstart = () => {
       $$('.mic-btn').forEach(b => b.classList.add('listening'));
@@ -559,6 +565,13 @@
     if (a === 'dish-submit') { const i = $('#dish-input'); showDishResult(i && i.value); return; }
     if (a === 'add-open' || a === 'add-photo') { showAddModal('text'); return; }
     if (a === 'add-tab') { addMode = el.dataset.mode; renderAddPanel(); return; }
+    if (a === 'voice-example') {
+      const input = $('#add-text');
+      if (input) { input.value = '买了6个鸡蛋和2盒牛奶放冷藏'; input.focus(); }
+      const t = $('#voice-status .voice-status-text');
+      if (t) t.textContent = '示例已填入，可直接点击“识别并入库”';
+      return;
+    }
     if (a === 'add-batch') { addBatch = el.dataset.batch === 'batch'; renderAddPanel(); return; }
     if (a === 'add-parse' || a === 'add-confirm') { addConfirm(); return; }
     if (a === 'voice-quick') { showAddModal('text'); setTimeout(() => startVoice('text'), 120); return; }

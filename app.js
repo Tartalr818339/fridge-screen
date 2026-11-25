@@ -253,8 +253,8 @@
     modalRoot.innerHTML = `<div class="modal-overlay" data-close="1"><div class="modal-card">${inner}</div></div>`;
   }
   function closeModal() { stopVoice(); modalRoot.innerHTML = ''; }
-  function modalHead(icon, title, sub) {
-    return `<div class="modal-head"><div class="modal-icon">${icon}</div><div><h3>${esc(title)}</h3><p>${esc(sub)}</p></div><button class="close-x" data-action="close">×</button></div>`;
+  function modalHead(icon, title, sub, subHtml) {
+    return `<div class="modal-head"><div class="modal-icon">${icon}</div><div><h3>${esc(title)}</h3><p>${subHtml || esc(sub)}</p></div><button class="close-x" data-action="close">×</button></div>`;
   }
   function showZoneModal(layer) {
     const its = ITEMS.filter(i => i.layer === layer);
@@ -269,7 +269,10 @@
   function showItemModal(id) {
     const i = ITEMS.find(x => x.id === id);
     if (!i) return;
-    openModal(modalHead(foodIcon(i.name, i.icon), i.name, i.layer) +
+    const layerCount = ITEMS.filter(x => x.layer === i.layer).length;
+    const layerTemp = (LAYER_META[i.layer] || {}).temp || '';
+    const subHtml = `<span class="layer-hover" data-action="layer-tip">${layerIcon(i.layer)} ${esc(i.layer)}<span class="layer-tip">${esc(layerTemp)} · 共 ${layerCount} 件食材</span></span>`;
+    openModal(modalHead(foodIcon(i.name, i.icon), i.name, i.layer, subHtml) +
       `<div class="detail-row"><span>数量</span><b>${i.quantity}${esc(i.unit)}</b></div>
        <div class="detail-row"><span>保质期至</span><b>${esc(i.expiryDate)}</b></div>
        <div class="detail-row"><span>剩余</span><b>${i.remainingDays === 0 ? '已过期' : i.remainingDays + ' 天'}</b></div>
@@ -515,6 +518,7 @@
     if (!el) return;
     const a = el.dataset.action;
     if (a === 'close') { closeModal(); return; }
+    if (a === 'layer-tip') { el.classList.toggle('open'); return; }
     if (a === 'zone') { showZoneModal(el.dataset.layer); return; }
     if (a === 'item') { showItemModal(el.dataset.id); return; }
     if (a === 'recipe') { showRecipeModal(el.dataset.id); return; }

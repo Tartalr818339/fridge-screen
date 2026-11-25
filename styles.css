@@ -282,6 +282,10 @@ button{cursor:pointer}
 .modal-card{--ink:#16231C;--muted:#6B7C72;--line:#DDE7E0;--soft:#E8F7EE;--deep:#0E7C3A;background:#fff;color:#16231C;font-size:15px}
 .modal-card .modal-head h3,.modal-card .modal-head p,.modal-card .detail-row,.modal-card .field label,.modal-card .model-option b,.modal-card .model-option span,.modal-card .photo-drop{color:#16231C}
 .modal-card .modal-head p,.modal-card .detail-row{font-size:15px}
+.modal-card .modal-head .layer-hover{position:relative;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;background:#EAF7EF;border:1px solid #CFE7D8;color:#0E7C3A;font-size:13px;font-weight:800;cursor:pointer;vertical-align:middle}
+.modal-card .modal-head .layer-hover .food-ico{width:17px;height:17px;vertical-align:middle}
+.modal-card .modal-head .layer-tip{position:absolute;left:0;top:calc(100% + 8px);white-space:nowrap;padding:7px 10px;border-radius:9px;background:#153B28;color:#fff;font-size:12px;font-weight:600;opacity:0;transform:translateY(-4px);pointer-events:none;transition:.18s;box-shadow:0 8px 20px rgba(0,0,0,.18);z-index:5}
+.modal-card .modal-head .layer-hover:hover .layer-tip,.modal-card .modal-head .layer-hover.open .layer-tip{opacity:1;transform:translateY(0)}
 .modal-card .btn-ghost{background:#E8F7EE;color:#0E7C3A}
 .modal-card .btn-primary{background:#0E7C3A;color:#fff}
 .modal-card .add-tab{background:#E8F7EE;color:#0E7C3A;font-size:14px}

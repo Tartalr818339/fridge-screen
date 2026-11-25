@@ -272,11 +272,21 @@
     const layerCount = ITEMS.filter(x => x.layer === i.layer).length;
     const layerTemp = (LAYER_META[i.layer] || {}).temp || '';
     const subHtml = `<span class="layer-hover" data-action="layer-tip">${layerIcon(i.layer)} ${esc(i.layer)}<span class="layer-tip">${esc(layerTemp)} · 共 ${layerCount} 件食材</span></span>`;
+    const rec = RECIPES.find(r => (r.expiring || []).includes(i.name) || r.ingredients.some(x => (typeof x === 'string' ? x : x.name) === i.name));
+    const recHtml = rec ? `<div class="modal-recipe">
+      <div class="modal-recipe-title">为这份食材推荐</div>
+      <button class="modal-recipe-card" data-action="recipe" data-id="${rec.id}">
+        <span class="modal-recipe-thumb">${rec.image ? `<img src="${rec.image}" alt="">` : rec.emoji}</span>
+        <span class="modal-recipe-copy"><b>${esc(rec.name)}</b><small>⏱ ${rec.minutes} 分钟 · 正好能用掉这份${esc(i.name)}</small></span>
+        <span class="spotlight-arrow">›</span>
+      </button>
+    </div>` : '';
     openModal(modalHead(foodIcon(i.name, i.icon), i.name, i.layer, subHtml) +
       `<div class="detail-row"><span>数量</span><b>${i.quantity}${esc(i.unit)}</b></div>
        <div class="detail-row"><span>保质期至</span><b>${esc(i.expiryDate)}</b></div>
        <div class="detail-row"><span>剩余</span><b>${i.remainingDays === 0 ? '已过期' : i.remainingDays + ' 天'}</b></div>
        <div class="detail-row"><span>来源</span><b>${esc(i.source)}</b></div>
+       ${recHtml}
        <div class="modal-actions"><button class="btn btn-ghost" data-action="close">关闭</button><button class="btn btn-primary" data-action="add-restock" data-name="${esc(i.name)}">加入补货清单</button></div>`);
   }
   function showRecipeModal(id) {

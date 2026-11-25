@@ -286,6 +286,16 @@ button{cursor:pointer}
 .modal-card .modal-head .layer-hover .food-ico{width:17px;height:17px;vertical-align:middle}
 .modal-card .modal-head .layer-tip{position:absolute;left:0;top:calc(100% + 8px);white-space:nowrap;padding:7px 10px;border-radius:9px;background:#153B28;color:#fff;font-size:12px;font-weight:600;opacity:0;transform:translateY(-4px);pointer-events:none;transition:.18s;box-shadow:0 8px 20px rgba(0,0,0,.18);z-index:5}
 .modal-card .modal-head .layer-hover:hover .layer-tip,.modal-card .modal-head .layer-hover.open .layer-tip{opacity:1;transform:translateY(0)}
+.modal-recipe{margin-top:14px}
+.modal-recipe-title{font-size:13px;font-weight:800;color:#0E7C3A;margin-bottom:7px}
+.modal-recipe-card{display:flex;align-items:center;gap:10px;width:100%;padding:9px;border:1px solid #CFE7D8;border-radius:12px;background:#F7FBF8;text-align:left;color:#16231C}
+.modal-recipe-card:hover{background:#F1F8F3}
+.modal-recipe-thumb{width:48px;height:48px;border-radius:10px;overflow:hidden;flex:none;background:#EAF7EF;display:grid;place-items:center}
+.modal-recipe-thumb img{width:100%;height:100%;object-fit:cover;object-position:center 35%;transform:scale(1.18)}
+.modal-recipe-copy{flex:1;min-width:0}
+.modal-recipe-copy b{display:block;font-size:14px;color:#16231C}
+.modal-recipe-copy small{display:block;font-size:12px;color:#6B7C72;margin-top:3px;line-height:1.4}
+.modal-recipe-card .spotlight-arrow{color:#6B7C72;font-size:20px}
 .modal-card .btn-ghost{background:#E8F7EE;color:#0E7C3A}
 .modal-card .btn-primary{background:#0E7C3A;color:#fff}
 .modal-card .add-tab{background:#E8F7EE;color:#0E7C3A;font-size:14px}

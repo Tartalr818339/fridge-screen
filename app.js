@@ -525,8 +525,9 @@
     }
     if (a === 'add-restock') {
       const name = el.dataset.name;
-      if (!STATE.restock.some(r => r.name === name)) STATE.restock.push({ id: 'rs-' + Date.now(), name, suggestQty: 1, unit: '份', source: '手动', status: '待补' });
-      closeModal(); go('restock'); toast('已加入补货清单'); return;
+      const exists = STATE.restock.some(r => r.name === name);
+      if (!exists) STATE.restock.push({ id: 'rs-' + Date.now(), name, suggestQty: 1, unit: '份', source: '手动', status: '待补' });
+      closeModal(); render(); toast(exists ? '已在补货清单中' : '已加入补货清单'); return;
     }
     if (a === 'restock-add') {
       const picked = STATE.restock.filter(r => STATE.checked.has(r.id) && r.status === '待补');

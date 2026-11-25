@@ -8,6 +8,9 @@
   const toastRoot = $('#toast-root');
 
   const ico = path => `<svg viewBox="0 0 24 24" fill-rule="evenodd" aria-hidden="true" focusable="false">${path}</svg>`;
+  const PLUS_ICON = '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>';
+  const PENCIL_ICON = '<path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>';
+  const MIC_ICON = '<path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V22h2v-3.08A7 7 0 0 0 19 12h-2z"/>';
   const TABS = [
     { key: 'home', icon: ico('<path d="M12 2 2 11h3v10h6v-6h2v6h6V11h3L12 2z"/>'), label: '总览' },
     { key: 'fridge', icon: ico('<path d="M5 2h14a2 2 0 0 1 2 2v5H3V4a2 2 0 0 1 2-2zm0 9h14v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z"/>'), label: '食材' },
@@ -38,7 +41,7 @@
   let filterLayer = 'all';
   let query = '';
   let searchComposing = false;
-  let addMode = 'photo';
+  let addMode = 'text';
   let addBatch = false;
   let voiceRecognition = null;
   let homeRecipeIndex = 0;
@@ -385,40 +388,32 @@
   }
   function addPanelHtml() {
     if (addBatch) {
-      if (addMode === 'photo') return `<div class="photo-drop" id="photo-drop">${emojiIcon('📷')} 点击选择多张食材照片，一次识别多件</div><input type="file" id="add-photos" accept="image/*" multiple style="display:none" />`;
       return `<div class="field"><textarea id="add-batch-text" rows="6" placeholder="每行写一样：鸡蛋 6枚&#10;牛奶 2盒&#10;番茄 4个"></textarea></div>
+        <div class="voice-status">也可以直接说一句话，系统会自动拆成多行</div>
         <button class="btn btn-ghost" data-action="add-parse">识别清单</button>`;
     }
-    if (addMode === 'manual') return `<div class="field"><label>食材名称</label><input id="m-name" placeholder="如：鸡蛋、牛奶" /><button class="mic-btn" data-action="voice-manual">${emojiIcon('🎤')}</button></div>
+    if (addMode === 'manual') return `<div class="field"><label>食材名称</label><input id="m-name" placeholder="说出或直接输入食材名称" /><button class="mic-btn" data-action="voice-manual" aria-label="语音输入食材名称">${ico(MIC_ICON)}</button></div>
+      <div id="voice-status" class="voice-status">点击麦克风说出食材名称，例如“鸡蛋”</div>
       <div class="field"><label>所在分区</label><select id="m-layer">${currentLayers().map(l => `<option>${l}</option>`).join('')}</select></div>
       <div class="field"><label>数量 / 单位 / 保质天数</label><input id="m-qty" type="number" value="1" style="width:70px;display:inline-block" /><input id="m-unit" value="份" style="width:70px;display:inline-block" /><input id="m-days" type="number" value="7" style="width:70px;display:inline-block" /></div>`;
-    if (addMode === 'text') return `<div class="field"><input id="add-text" placeholder="例如：买了6个鸡蛋和2盒牛奶放冷藏" /><button class="mic-btn" data-action="voice-text">${emojiIcon('🎤')}</button></div>
+    return `<div class="field"><label>一句话录入</label><input id="add-text" placeholder="例如：买了6个鸡蛋和2盒牛奶放冷藏" /><button class="mic-btn" data-action="voice-text" aria-label="语音识别食材">${ico(MIC_ICON)}</button></div>
+      <div id="voice-status" class="voice-status">点击麦克风说出食材，例如“6个鸡蛋和2盒牛奶”</div>
       <button class="btn btn-ghost" data-action="add-parse">识别食材</button>`;
-    return `<div class="photo-drop" id="photo-drop">${emojiIcon('📷')} 点击选择食材照片</div><input type="file" id="add-photo" accept="image/*" style="display:none" />`;
-  }
-  function bindAddPanel() {
-    const drop = $('#photo-drop');
-    if (drop) drop.onclick = () => { const f = $(addBatch ? '#add-photos' : '#add-photo'); if (f) f.click(); };
-    const file = $('#add-photo');
-    if (file) file.onchange = () => { file.dataset.ready = '1'; drop.innerHTML = `${emojiIcon('✅')} 已识别：全脂牛奶 1盒 · 吐司面包 1袋`; };
-    const files = $('#add-photos');
-    if (files) files.onchange = () => { files.dataset.ready = '1'; drop.innerHTML = `${emojiIcon('✅')} 已识别 3 样食材：鲜鸡蛋 / 全脂牛奶 / 番茄`; };
   }
   function renderAddPanel() {
+    stopVoice();
     const panel = $('#add-panel'); if (!panel) return;
     panel.innerHTML = addPanelHtml();
     $$('.add-tab').forEach(b => b.classList.toggle('active', b.dataset.mode === addMode));
     $$('.batch-seg').forEach(b => b.classList.toggle('active', (b.dataset.batch === 'batch') === addBatch));
     const btn = $('[data-action="add-confirm"]');
     if (btn) btn.textContent = (addBatch || addMode === 'text') ? '识别并入库' : '确认添加';
-    bindAddPanel();
   }
   function showAddModal(mode) {
-    addMode = mode || 'photo'; addBatch = false;
-    openModal(modalHead(emojiIcon('🧺'), '录入食材', '拍照 / 手动 / 一句话，都支持单件或批量') +
-      `<div class="add-tabs"><button class="add-tab" data-action="add-tab" data-mode="photo">${emojiIcon('📷')} 拍照</button>
-        <button class="add-tab" data-action="add-tab" data-mode="manual">${emojiIcon('✍️')} 手动</button>
-        <button class="add-tab" data-action="add-tab" data-mode="text">${emojiIcon('💬')} 一句话</button></div>
+    addMode = mode === 'manual' ? 'manual' : 'text'; addBatch = false;
+    openModal(modalHead(ico(PLUS_ICON), '录入食材', '手动或说一句话，都支持单件或批量') +
+      `<div class="add-tabs"><button class="add-tab" data-action="add-tab" data-mode="manual">${ico(PENCIL_ICON)} 手动</button>
+        <button class="add-tab" data-action="add-tab" data-mode="text">${ico(MIC_ICON)} 语音一句话</button></div>
        <div class="batch-toggle"><button class="batch-seg" data-action="add-batch" data-batch="single">单件</button><button class="batch-seg" data-action="add-batch" data-batch="batch">批量</button></div>
        <div id="add-panel"></div>
        <div class="modal-actions"><button class="btn btn-ghost" data-action="close">取消</button><button class="btn btn-primary" data-action="add-confirm">确认添加</button></div>`);
@@ -426,40 +421,27 @@
   }
   function addConfirm() {
     if (addBatch) {
-      if (addMode === 'photo') {
-        const f = $('#add-photos');
-        if (!f || !f.dataset.ready) { toast('请先选择多张照片'); return; }
-        addParsed([{ name: '鲜鸡蛋', qty: 6, unit: '枚', layer: '冷藏室中层', days: 10 },
-          { name: '全脂牛奶', qty: 1, unit: '盒', layer: '冷藏室上层', days: 8 },
-          { name: '番茄', qty: 4, unit: '个', layer: '果蔬抽屉', days: 5 }], '拍照录入');
-      } else {
-        const text = ($('#add-batch-text') && $('#add-batch-text').value) || '';
-        const list = text.split(/\n+/).map(line => {
-          const p = parseFoodText(line)[0];
-          if (p) return p;
-          const m = line.trim().match(/^(.+?)\s*(\d+)\s*([个盒枚袋瓶根颗块份只])?$/);
-          if (!m) return null;
-          return { name: m[1].trim(), qty: +m[2], unit: m[3] || '份', layer: defaultLayerForFood(m[1].trim()), days: 7 };
-        }).filter(Boolean);
-        if (!list.length) { toast('每行写一样食材'); return; }
-        addParsed(list, '批量录入');
-      }
-      closeModal(); return;
-    }
-    if (addMode === 'photo') {
-      const f = $('#add-photo');
-      if (!f || !f.dataset.ready) { toast('请先选择一张照片'); return; }
-      addParsed([{ name: '全脂牛奶', qty: 1, unit: '盒', layer: '冷藏室上层', days: 8 },
-        { name: '吐司面包', qty: 1, unit: '袋', layer: '冷藏室上层', days: 7 }], '拍照录入');
+      const text = ($('#add-batch-text') && $('#add-batch-text').value) || '';
+      const list = text.split(/\n+/).map(line => {
+        const p = parseFoodText(line)[0];
+        if (p) return p;
+        const m = line.trim().match(/^(.+?)\s*(\d+)\s*([个盒枚袋瓶根颗块份只])?$/);
+        if (!m) return null;
+        return { name: m[1].trim(), qty: +m[2], unit: m[3] || '份', layer: defaultLayerForFood(m[1].trim()), days: 7 };
+      }).filter(Boolean);
+      if (!list.length) { toast('每行写一样食材'); return; }
+      addParsed(list, '批量录入');
       closeModal(); return;
     }
     if (addMode === 'text') {
-      const list = parseFoodText(($('#add-text') && $('#add-text').value) || '');
+      const text = ($('#add-text') && $('#add-text').value || '').trim();
+      if (!text) { toast('说一句话或输入食材，例如「6个鸡蛋」'); return; }
+      const list = parseFoodText(text);
       if (!list.length) { toast('没识别到食材，试试「6个鸡蛋」'); return; }
       addParsed(list, '语音/一句话'); closeModal(); return;
     }
     const name = ($('#m-name') && $('#m-name').value || '').trim();
-    if (!name) { toast('请输入食材名称'); return; }
+    if (!name) { toast('请输入或说出食材名称'); return; }
     addParsed([{ name, qty: +($('#m-qty').value || 1), unit: $('#m-unit').value || '份',
       layer: $('#m-layer').value, days: +($('#m-days').value || 7) }], '手动录入');
     closeModal();
@@ -467,23 +449,51 @@
   function stopVoice() {
     if (voiceRecognition) { try { voiceRecognition.stop(); } catch (e) {} voiceRecognition = null; }
     $$('.mic-btn').forEach(b => b.classList.remove('listening'));
+    const status = $('#voice-status');
+    if (status && status.dataset.live) status.textContent = '已停止识别，可重新点击麦克风';
   }
   function startVoice(type) {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { toast('请用 Chrome / Edge 打开以支持语音识别'); return; }
-    stopVoice();
-    const rec = new SR(); rec.lang = 'zh-CN'; rec.interimResults = false;
-    rec.onstart = () => { $$('.mic-btn').forEach(b => b.classList.add('listening')); toast('正在听，请说出食材'); };
-    rec.onresult = e => {
-      const text = (e.results[0][0].transcript || '').trim();
-      if (!text) return;
-      if (type === 'text') { const el = $('#add-text'); if (el) el.value = text; addConfirm(); }
-      else { const el = $('#m-name'); if (el) el.value = text; toast('已识别：' + text); }
+    if (!SR) { toast('当前浏览器不支持语音识别，请用 Chrome 或 Edge 打开'); return; }
+    if (voiceRecognition) { stopVoice(); toast('已停止识别'); return; }
+    const rec = new SR();
+    rec.lang = 'zh-CN'; rec.continuous = false; rec.interimResults = true; rec.maxAlternatives = 1;
+    let finalText = '';
+    const setStatus = text => {
+      const s = $('#voice-status');
+      if (s) { s.dataset.live = '1'; s.textContent = text; }
     };
-    rec.onerror = () => toast('语音识别失败，请检查麦克风权限');
+    rec.onstart = () => {
+      $$('.mic-btn').forEach(b => b.classList.add('listening'));
+      setStatus('正在听，请说出食材…'); toast('正在听，请说出食材');
+    };
+    rec.onresult = e => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i += 1) {
+        const t = e.results[i][0].transcript || '';
+        if (e.results[i].isFinal) finalText += t; else interim += t;
+      }
+      const shown = (finalText + interim).trim();
+      if (type === 'text') {
+        const el = $('#add-text'); if (el) el.value = shown;
+        setStatus(finalText ? '已识别：' + finalText : '正在听… ' + interim);
+        if (finalText) setTimeout(() => { if ($('#add-text')) addConfirm(); }, 180);
+      } else {
+        const el = $('#m-name'); if (el) el.value = shown;
+        setStatus(finalText ? '已识别：' + finalText : '正在听… ' + interim);
+        if (finalText) toast('已识别：' + finalText);
+      }
+    };
+    rec.onerror = e => {
+      const msg = e.error === 'not-allowed' || e.error === 'service-not-allowed' ? '请允许麦克风权限后再试'
+        : e.error === 'no-speech' ? '没听清，请再试一次'
+        : e.error === 'network' ? '语音服务网络异常，请检查网络'
+        : '语音识别失败，请再试一次';
+      toast(msg); setStatus(msg);
+    };
     rec.onend = () => { $$('.mic-btn').forEach(b => b.classList.remove('listening')); voiceRecognition = null; };
     voiceRecognition = rec;
-    try { rec.start(); } catch (e) { toast('语音识别启动失败'); }
+    try { rec.start(); } catch (e) { toast('语音识别启动失败，请再试一次'); voiceRecognition = null; }
   }
   function showModelModal() {
     openModal(modalHead(emojiIcon('🧊'), '冰箱型号', '不同冰箱的分区结构不同，可按实际情况选择') +
@@ -547,7 +557,7 @@
     if (a === 'dish-modal') { showDishModal(); return; }
     if (a === 'dish-quick') { showDishResult(el.dataset.q); return; }
     if (a === 'dish-submit') { const i = $('#dish-input'); showDishResult(i && i.value); return; }
-    if (a === 'add-open' || a === 'add-photo') { showAddModal('photo'); return; }
+    if (a === 'add-open' || a === 'add-photo') { showAddModal('text'); return; }
     if (a === 'add-tab') { addMode = el.dataset.mode; renderAddPanel(); return; }
     if (a === 'add-batch') { addBatch = el.dataset.batch === 'batch'; renderAddPanel(); return; }
     if (a === 'add-parse' || a === 'add-confirm') { addConfirm(); return; }

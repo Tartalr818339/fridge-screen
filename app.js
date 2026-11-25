@@ -249,7 +249,7 @@
           <span class="cart-price">¥${((c.price || 0) * c.qty).toFixed(2)}</span>
         </div>`).join('') : '<div class="empty-note">购物车还是空的，去食材页或食谱里加购吧</div>'}
       </section>
-      <div class="summary-bar"><span>已选 <b>${count}</b> 件 · 合计 <b>¥${amount.toFixed(2)}</b></span><button class="btn btn-primary" data-action="checkout">确认下单 · 自动入库</button></div>`;
+      <div class="summary-bar"><span>已选 <b>${count}</b> 件</span><span class="summary-price">合计 <b>¥${amount.toFixed(2)}</b></span><button class="btn btn-primary" data-action="checkout">确认下单 · 自动入库</button></div>`;
   }
   function pageDevice() {
     const d = STATE.device;

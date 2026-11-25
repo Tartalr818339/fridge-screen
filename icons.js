@@ -73,7 +73,7 @@
     '青椒': 'pepper', '🫑': 'pepper',
     '蒜': 'garlic', '🧄': 'garlic', '葱': 'scallion', '🌿': 'scallion', '姜': 'ginger', '🫚': 'ginger',
     '可乐': 'cola', '🥤': 'cola', '糖': 'sugar', '🍬': 'sugar', '米饭': 'rice', '🍚': 'rice', '燕麦': 'oat', '🌾': 'oat',
-    '🍳': 'pan', '🍲': 'soup', '🍜': 'soup', '🥗': 'salad', '🥪': 'sandwich', '🍽️': 'plate', '🍽': 'plate',
+    '🍳': 'pan', '🍲': 'soup', '🍜': 'soup', '🍮': 'soup', '🥗': 'salad', '🥪': 'sandwich', '🍽️': 'plate', '🍽': 'plate',
     '🧊': 'fridge', '❄️': 'snow', '❄': 'snow',
     '📷': 'camera', '✍️': 'pen', '✍': 'pen', '💬': 'chat', '🧺': 'basket', '📡': 'nfc', '✅': 'check', '✔': 'check', '🎤': 'mic', '🛒': 'cart'
   };

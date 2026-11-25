@@ -153,24 +153,20 @@
   function recipePanel(urgent) {
     const list = recipeCandidates(urgent);
     if (!list.length) return '';
-    const r = list[homeRecipeIndex % list.length];
     const urgentNames = new Set(urgent.map(i => i.name));
-    const used = (r.expiring || []).filter(n => urgentNames.has(n));
-    const have = r.ingredients
-      .map(x => typeof x === 'string' ? x : (x.have ? x.name : null))
-      .filter(Boolean).slice(0, 4);
-    return `<section class="panel recipe-spotlight">
-      <div class="panel-head"><h2>今日推荐</h2><button class="link-btn" data-action="recipe-next">换一道 ›</button></div>
-      <button class="spotlight-main" data-action="recipe" data-id="${r.id}">
-        <span class="spotlight-thumb">${r.image ? `<img src="${r.image}" alt="" loading="lazy" />` : r.emoji}</span>
-        <span class="spotlight-copy">
-          <b>${esc(r.name)}</b>
-          <small>⏱ ${r.minutes} 分钟 · ${r.ingredients.length} 样食材</small>
-          <em>${used.length ? '正好用掉快到期的 ' + used.map(esc).join('、') : '用冰箱现有食材做点好的'}</em>
-        </span>
+    const start = (homeRecipeIndex * 5) % list.length;
+    const rows = Array.from({ length: Math.min(5, list.length) }, (_, k) => {
+      const r = list[(start + k) % list.length];
+      const used = (r.expiring || []).filter(n => urgentNames.has(n));
+      return `<button class="recipe-row" data-action="recipe" data-id="${r.id}">
+        <span class="recipe-row-thumb">${r.image ? `<img src="${r.image}" alt="" loading="lazy" />` : r.emoji}</span>
+        <span class="recipe-row-copy"><b>${esc(r.name)}</b><small>⏱ ${r.minutes} 分钟 · ${used.length ? '可用掉 ' + used.map(esc).join('、') : '用现有食材做点好的'}</small></span>
         <span class="spotlight-arrow">›</span>
-      </button>
-      <div class="spotlight-have">${have.length ? have.map(n => `<span>✓ ${esc(n)}</span>`).join('') : '<span>冰箱里还没有明确用料</span>'}</div>
+      </button>`;
+    }).join('');
+    return `<section class="panel recipe-spotlight">
+      <div class="panel-head"><h2>今日推荐</h2><button class="link-btn" data-action="recipe-next">换一批 ›</button></div>
+      <div class="recipe-rows">${rows}</div>
       <button class="dish-entry" data-action="dish-modal">想做别的？告诉我想吃什么</button>
     </section>`;
   }
@@ -272,14 +268,14 @@
     const layerCount = ITEMS.filter(x => x.layer === i.layer).length;
     const layerTemp = (LAYER_META[i.layer] || {}).temp || '';
     const subHtml = `<span class="layer-hover" data-action="layer-tip">${layerIcon(i.layer)} ${esc(i.layer)}<span class="layer-tip">${esc(layerTemp)} · 共 ${layerCount} 件食材</span></span>`;
-    const rec = RECIPES.find(r => (r.expiring || []).includes(i.name) || r.ingredients.some(x => (typeof x === 'string' ? x : x.name) === i.name));
-    const recHtml = rec ? `<div class="modal-recipe">
+    const recs = RECIPES.filter(r => (r.expiring || []).includes(i.name) || r.ingredients.some(x => (typeof x === 'string' ? x : x.name) === i.name)).slice(0, 2);
+    const recHtml = recs.length ? `<div class="modal-recipe">
       <div class="modal-recipe-title">为这份食材推荐</div>
-      <button class="modal-recipe-card" data-action="recipe" data-id="${rec.id}">
+      ${recs.map(rec => `<button class="modal-recipe-card" data-action="recipe" data-id="${rec.id}">
         <span class="modal-recipe-thumb">${rec.image ? `<img src="${rec.image}" alt="">` : rec.emoji}</span>
         <span class="modal-recipe-copy"><b>${esc(rec.name)}</b><small>⏱ ${rec.minutes} 分钟 · 正好能用掉这份${esc(i.name)}</small></span>
         <span class="spotlight-arrow">›</span>
-      </button>
+      </button>`).join('')}
     </div>` : '';
     openModal(modalHead(foodIcon(i.name, i.icon), i.name, i.layer, subHtml) +
       `<div class="detail-row"><span>数量</span><b>${i.quantity}${esc(i.unit)}</b></div>

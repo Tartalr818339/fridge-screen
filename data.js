@@ -84,7 +84,31 @@ const RECIPES = [
       { name: '豆腐', have: true }, { name: '番茄', have: true }, { name: '西兰花', have: true }
     ],
     expiring: ['番茄'],
-    steps: ['食材切块备用。', '水开下豆腐与蔬菜。', '小火煮 8 分钟，加盐调味。'] }
+    steps: ['食材切块备用。', '水开下豆腐与蔬菜。', '小火煮 8 分钟，加盐调味。'] },
+  { id: 'rc-04', name: '番茄鸡蛋面', emoji: '🍜', image: './assets/recipes/tomato-eggs.png', minutes: 18, thumb: 'linear-gradient(135deg,#FFB86B,#FF7A59)',
+    ingredients: [
+      { name: '番茄', have: true }, { name: '鲜鸡蛋', have: true }, { name: '面条', have: false }
+    ],
+    expiring: ['番茄', '鲜鸡蛋'],
+    steps: ['番茄切丁炒出汁，加水煮开。', '下面条煮至八分熟。', '淋入蛋液，加盐和葱花即可。'] },
+  { id: 'rc-05', name: '酸奶水果杯', emoji: '🥣', image: './assets/recipes/yogurt-cup.png', minutes: 5, thumb: 'linear-gradient(135deg,#A8E063,#56AB2F)',
+    ingredients: [
+      { name: '原味酸奶', have: true }, { name: '蓝莓', have: true }, { name: '红苹果', have: true }
+    ],
+    expiring: ['原味酸奶', '蓝莓'],
+    steps: ['苹果切小块，蓝莓洗净。', '杯中铺一层酸奶。', '摆上水果，再淋一层酸奶即可。'] },
+  { id: 'rc-06', name: '奶酪烤吐司', emoji: '🥪', image: './assets/recipes/cheese-toast.png', minutes: 10, thumb: 'linear-gradient(135deg,#F4C542,#D69A00)',
+    ingredients: [
+      { name: '吐司面包', have: true }, { name: '奶酪', have: true }, { name: '鲜鸡蛋', have: true }
+    ],
+    expiring: ['奶酪', '吐司面包'],
+    steps: ['吐司片铺上奶酪。', '空气炸锅 180℃ 烤 5 分钟。', '夹层加煎蛋，对切装盘。'] },
+  { id: 'rc-07', name: '牛奶炖蛋', emoji: '🍮', image: './assets/recipes/milk-custard.png', minutes: 20, thumb: 'linear-gradient(135deg,#FFE9A8,#F2B705)',
+    ingredients: [
+      { name: '全脂牛奶', have: true }, { name: '鲜鸡蛋', have: true }, { name: '糖', have: false }
+    ],
+    expiring: ['全脂牛奶', '鲜鸡蛋'],
+    steps: ['鸡蛋加糖打散，倒入温牛奶搅匀。', '过筛后盖上保鲜膜。', '中小火蒸 15 分钟，静置 2 分钟即可。'] }
 ];
 
 // 配菜菜品库：含菜名、常见食材与分类标签

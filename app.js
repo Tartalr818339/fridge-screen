@@ -154,8 +154,8 @@
     const list = recipeCandidates(urgent);
     if (!list.length) return '';
     const urgentNames = new Set(urgent.map(i => i.name));
-    const start = (homeRecipeIndex * 5) % list.length;
-    const rows = Array.from({ length: Math.min(5, list.length) }, (_, k) => {
+    const start = (homeRecipeIndex * 3) % list.length;
+    const rows = Array.from({ length: Math.min(3, list.length) }, (_, k) => {
       const r = list[(start + k) % list.length];
       const used = (r.expiring || []).filter(n => urgentNames.has(n));
       return `<button class="recipe-row" data-action="recipe" data-id="${r.id}">

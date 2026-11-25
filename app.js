@@ -288,8 +288,14 @@
   function showRecipeModal(id) {
     const r = RECIPES.find(x => x.id === id);
     if (!r) return;
+    const videoHtml = r.video ? `<a class="recipe-video" href="${esc(r.video.url)}" target="_blank" rel="noopener noreferrer">
+      <span class="recipe-video-play">▶</span>
+      <span class="recipe-video-copy"><b>视频教学 · 哔哩哔哩</b><small>${esc(r.video.title)} · UP ${esc(r.video.author)}</small></span>
+      <span class="recipe-video-open">打开 ›</span>
+    </a>` : '';
     openModal(modalHead(emojiIcon(r.emoji), r.name, r.minutes + ' 分钟') +
       `<div class="detail-row"><span>食材</span><span>${r.ingredients.map(x => (x.have ? '✓ ' : '+ ') + esc(x.name)).join(' · ')}</span></div>` +
+      videoHtml +
       r.steps.map((s, n) => `<div class="detail-row"><span>${n + 1}.</span><span>${esc(s)}</span></div>`).join('') +
       '<div class="modal-actions"><button class="btn btn-primary" data-action="close">完成</button></div>');
   }

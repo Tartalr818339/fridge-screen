@@ -37,6 +37,7 @@
 
   let filterLayer = 'all';
   let query = '';
+  let searchComposing = false;
   let addMode = 'photo';
   let addBatch = false;
   let voiceRecognition = null;
@@ -206,10 +207,14 @@
         </button>`).join('')}</div></div>`;
     }).join('') || '<div class="panel">没有找到匹配的食材</div>';
   }
+  function updateFridgeResults() {
+    const box = $('#fridge-results');
+    if (box) box.innerHTML = fridgeResultHtml();
+  }
   function pageFridge() {
     const layers = currentLayers();
     return `<div class="page-head"><div><h1>冰箱食材</h1><p>共 ${ITEMS.length} 件 · ${layers.length} 个分区 · 实时同步</p></div><button class="btn btn-primary" data-action="add-open">＋ 录入食材</button></div>
-      <div class="toolbar"><input id="search" class="search" placeholder="搜索食材名称" value="${esc(query)}" />
+      <div class="toolbar"><input id="search" class="search" type="text" lang="zh-CN" autocomplete="off" placeholder="搜索食材名称" value="${esc(query)}" />
         <button class="chip ${filterLayer === 'all' ? 'active' : ''}" data-filter="all">全部分区</button>
         ${layers.map(l => `<button class="chip ${filterLayer === l ? 'active' : ''}" data-filter="${esc(l)}">${esc(l)}</button>`).join('')}
       </div>
@@ -600,12 +605,20 @@
     if (a === 'toggle-nfc') { STATE.device.nfcBound = !STATE.device.nfcBound; render(); toast(STATE.device.nfcBound ? '碰一碰已开启' : '碰一碰已关闭'); return; }
     if (a === 'reset') { location.reload(); return; }
   });
-  document.addEventListener('input', e => {
+  document.addEventListener('compositionstart', e => {
+    if (e.target.id === 'search') searchComposing = true;
+  });
+  document.addEventListener('compositionend', e => {
     if (e.target.id === 'search') {
+      searchComposing = false;
       query = e.target.value.trim();
-      const box = $('#fridge-results');
-      if (box) box.innerHTML = fridgeResultHtml();
+      updateFridgeResults();
     }
+  });
+  document.addEventListener('input', e => {
+    if (e.target.id !== 'search' || searchComposing || e.isComposing) return;
+    query = e.target.value.trim();
+    updateFridgeResults();
   });
   render();
 })();

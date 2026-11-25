@@ -58,7 +58,7 @@
     '豆腐': 'tofu', '🧈': 'tofu',
     '鸡胸肉': 'chicken', '鸡肉': 'chicken', '🍗': 'chicken', '鸡翅': 'chicken', '🍖': 'chicken',
     '西兰花': 'broccoli', '花椰菜': 'broccoli', '🥦': 'broccoli', '冷冻西兰花': 'frozenBroccoli',
-    '番茄': 'tomato', '西红柿': 'tomato', '🍅': 'tomato',
+    '番茄': 'tomato', '西红柿': 'tomato', '🍅': 'tomato', '面条': 'soup', '面': 'soup',
     '红苹果': 'apple', '苹果': 'apple', '🍎': 'apple',
     '胡萝卜': 'carrot', '🥕': 'carrot',
     '生菜': 'lettuce', '青菜': 'lettuce', '🥬': 'lettuce',

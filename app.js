@@ -69,6 +69,7 @@
     else if (p === 'fridge') html = pageFridge();
     else if (p === 'recipes') html = pageRecipes();
     else if (p === 'restock') html = pageRestock();
+    else if (p === 'cart') html = pageCart();
     else if (p === 'device') html = pageDevice();
     content.innerHTML = `<div class="page-enter">${html}</div>`;
     content.scrollTop = 0;
@@ -225,6 +226,16 @@
           <span class="restock-status">${r.status === '已加购' ? '已加购' : r.status === '暂不补货' ? '暂不补货' : '待补'}</span></div>`;
       }).join('')}</div>
       <div class="summary-bar"><span>还有 <b>${pending}</b> 项待补 · 勾选后可一次加购</span><button class="btn btn-primary" data-action="restock-add">勾选加入购物车</button></div>`;
+  }
+  function pageCart() {
+    const total = STATE.cart.reduce((n, c) => n + c.qty, 0);
+    return `<div class="page-head"><div><h1>购物车</h1><p>${total} 件商品 · 确认后自动入库到冰箱</p></div><button class="btn btn-ghost" data-nav="restock">返回补货清单</button></div>
+      <section class="panel">${STATE.cart.length ? STATE.cart.map((c, idx) => `<div class="restock-row">
+        <span class="ico-badge">${foodIcon(PRODUCT_MAPPING[c.sku] || c.name)}</span>
+        <div class="flex"><div class="restock-name">${esc(c.name)}</div><div class="restock-meta">${c.qty} 件 · 来自补货清单</div></div>
+        <button class="link-btn" data-action="cart-qty" data-idx="${idx}">＋ 加一件</button>
+      </div>`).join('') : '<div class="empty-note">购物车还是空的</div>'}</section>
+      <div class="summary-bar"><span>共 <b>${total}</b> 件商品</span><button class="btn btn-primary" data-action="checkout">确认下单 · 自动入库</button></div>`;
   }
   function pageDevice() {
     const d = STATE.device;
@@ -534,7 +545,7 @@
       let added = 0;
       picked.forEach(r => { const sku = Object.keys(PRODUCT_MAPPING).find(k => PRODUCT_MAPPING[k] === r.name); if (sku) { addToCart(sku, r.id); added += 1; } });
       render();
-      if (added) showCartModal(); else toast('请先勾选可加购的食材');
+      if (added) go('cart'); else toast('请先勾选可加购的食材');
       return;
     }
     if (a === 'auto-manual') { closeModal(); toast('已保留在补货清单'); return; }
@@ -545,11 +556,11 @@
         if (sku) { addToCart(sku, r.id); added += 1; }
       });
       closeModal(); render();
-      if (added) showCartModal(); else toast('暂无可自动加购的食材');
+      if (added) go('cart'); else toast('暂无可自动加购的食材');
       return;
     }
-    if (a === 'cart-open') { showCartModal(); return; }
-    if (a === 'cart-qty') { const c = STATE.cart[+el.dataset.idx]; if (c) c.qty += 1; showCartModal(); return; }
+    if (a === 'cart-open') { go('cart'); return; }
+    if (a === 'cart-qty') { const c = STATE.cart[+el.dataset.idx]; if (c) { c.qty += 1; render(); } return; }
     if (a === 'checkout') {
       STATE.cart.forEach(c => { const it = purchaseToItem(c.sku); if (it) ITEMS.push(it); });
       STATE.cart = []; closeModal(); go('home'); toast('下单成功，食材已自动入库'); return;

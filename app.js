@@ -12,7 +12,7 @@
     { key: 'home', icon: ico('<path d="M12 2 2 11h3v10h6v-6h2v6h6V11h3L12 2z"/>'), label: '总览' },
     { key: 'fridge', icon: ico('<path d="M5 2h14a2 2 0 0 1 2 2v5H3V4a2 2 0 0 1 2-2zm0 9h14v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9z"/>'), label: '食材' },
     { key: 'recipes', icon: ico('<path d="M3 11h18a1 1 0 0 1 1 1c0 4.4-4.5 8-10 8S2 16.4 2 12a1 1 0 0 1 1-1zm5-8h2v7H8V3zm4 0h2v7h-2V3z"/>'), label: '食谱' },
-    { key: 'restock', icon: ico('<path d="M2 3h2.6l1 3.5h14.1l-2.3 8.5H7.2L6.5 18h11.8v2H5.2a2 2 0 0 1-2-2L2 3zm4.5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm9.5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>'), label: '补货' },
+    { key: 'cart', icon: ico('<path d="M2 3h2.6l1 3.5h14.1l-2.3 8.5H7.2L6.5 18h11.8v2H5.2a2 2 0 0 1-2-2L2 3zm4.5 17a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm9.5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>'), label: '购物车' },
     { key: 'device', icon: ico('<path d="M19.4 13a7.8 7.8 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7.6 7.6 0 0 0-1.7-1L15 3.5h-4l-.4 2.4a7.6 7.6 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.8 7.8 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7.6 7.6 0 0 0 1.7 1l.4 2.4h4l.4-2.4a7.6 7.6 0 0 0 1.7-1l2.5 1 2-3.5L19.4 13zM13 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/>'), label: '设置' }
   ];
 
@@ -69,16 +69,11 @@
     if (p === 'home') html = pageHome();
     else if (p === 'fridge') html = pageFridge();
     else if (p === 'recipes') html = pageRecipes();
-    else if (p === 'restock') html = pageRestock();
     else if (p === 'cart') html = pageCart();
     else if (p === 'device') html = pageDevice();
     content.innerHTML = `<div class="page-enter">${html}</div>`;
     content.scrollTop = 0;
     renderNav();
-    if (p === 'restock' && !STATE.autoRestockAsked) {
-      STATE.autoRestockAsked = true;
-      setTimeout(showAutoRestock, 120);
-    }
   }
   function go(page) { STATE.appPage = page; render(); }
 
@@ -132,8 +127,8 @@
     const restock = STATE.restock.find(r => r.status === '待补');
     const restockRow = restock ? `<div class="reminder-row soft">
       <span class="reminder-emoji">${foodIcon(restock.name, restock.icon || '')}</span>
-      <span class="reminder-copy"><b>${esc(restock.name)} <em class="restock-flag">${emojiIcon('🛒')} 待补货</em></b><small>常买清单里还缺，顺手补上吧</small></span>
-      <button class="mini-btn" data-action="add-restock" data-name="${esc(restock.name)}">加入补货</button>
+      <span class="reminder-copy"><b>${esc(restock.name)} <em class="restock-flag">${emojiIcon('🛒')} 待加购</em></b><small>常买的还缺，顺手加购吧</small></span>
+      <button class="mini-btn" data-action="add-restock" data-name="${esc(restock.name)}">加入购物车</button>
     </div>` : '';
     const empty = !rows && !restockRow ? '<div class="empty-note">最近没有需要操心的事，冰箱状态很好</div>' : '';
     return `<section class="panel reminder-panel">
@@ -228,26 +223,30 @@
         ${r.expiring.length ? `<div class="recipe-tip">能用掉快到期的：${r.expiring.map(esc).join('、')}</div>` : ''}</div>
       </button>`).join('')}</div>`;
   }
-  function pageRestock() {
-    const pending = STATE.restock.filter(r => r.status === '待补').length;
-    return `<div class="page-head"><div><h1>补货清单</h1><p>冰箱里缺的都在这里，买完回来更新</p></div><div style="display:flex;gap:8px"><button class="btn btn-ghost" data-action="cart-open">购物车 ${STATE.cart.length}</button><button class="btn btn-primary" data-action="pupu">去朴朴采购 ›</button></div></div>
-      <div class="panel">${STATE.restock.map(r => {
-        const checked = STATE.checked.has(r.id);
-        return `<div class="restock-row"><div class="restock-check ${checked ? 'on' : ''}" data-action="restock-toggle" data-id="${r.id}">${checked ? '✓' : ''}</div>
-          <div class="flex"><div class="restock-name">${esc(r.name)}</div><div class="restock-meta">建议 ${r.suggestQty}${esc(r.unit)} · ${esc(r.source)}</div></div>
-          <span class="restock-status">${r.status === '已加购' ? '已加购' : r.status === '暂不补货' ? '暂不补货' : '待补'}</span></div>`;
-      }).join('')}</div>
-      <div class="summary-bar"><span>还有 <b>${pending}</b> 项待补 · 勾选后可一次加购</span><button class="btn btn-primary" data-action="restock-add">勾选加入购物车</button></div>`;
-  }
   function pageCart() {
-    const total = STATE.cart.reduce((n, c) => n + c.qty, 0);
-    return `<div class="page-head"><div><h1>购物车</h1><p>${total} 件商品 · 确认后自动入库到冰箱</p></div><button class="btn btn-ghost" data-nav="restock">返回补货清单</button></div>
-      <section class="panel">${STATE.cart.length ? STATE.cart.map((c, idx) => `<div class="restock-row">
-        <span class="ico-badge">${foodIcon(PRODUCT_MAPPING[c.sku] || c.name)}</span>
-        <div class="flex"><div class="restock-name">${esc(c.name)}</div><div class="restock-meta">${c.qty} 件 · 来自补货清单</div></div>
-        <button class="link-btn" data-action="cart-qty" data-idx="${idx}">＋ 加一件</button>
-      </div>`).join('') : '<div class="empty-note">购物车还是空的</div>'}</section>
-      <div class="summary-bar"><span>共 <b>${total}</b> 件商品</span><button class="btn btn-primary" data-action="checkout">确认下单 · 自动入库</button></div>`;
+    const selected = STATE.cart.filter(c => c.selected);
+    const count = selected.reduce((n, c) => n + c.qty, 0);
+    const amount = selected.reduce((n, c) => n + (c.price || 0) * c.qty, 0);
+    const allSelected = STATE.cart.length > 0 && selected.length === STATE.cart.length;
+    return `<div class="page-head"><div><h1>购物车</h1><p>${STATE.cart.length} 种商品 · 勾选后确认下单，自动入库到冰箱</p></div><button class="btn btn-ghost" data-nav="fridge">继续选食材</button></div>
+      <section class="panel">
+        ${STATE.cart.length ? `<div class="panel-head cart-toolbar">
+          <button class="cart-select-all" data-action="cart-select-all"><span class="restock-check ${allSelected ? 'on' : ''}">${allSelected ? '✓' : ''}</span>全选</button>
+          <span class="hint">已选 ${selected.length} 种 · ${count} 件</span>
+        </div>` : ''}
+        ${STATE.cart.length ? STATE.cart.map((c, idx) => `<div class="restock-row cart-row">
+          <div class="restock-check ${c.selected ? 'on' : ''}" data-action="cart-select" data-idx="${idx}">${c.selected ? '✓' : ''}</div>
+          <span class="ico-badge">${foodIcon(PRODUCT_MAPPING[c.sku] || c.name)}</span>
+          <div class="flex"><div class="restock-name">${esc(c.name)}</div><div class="restock-meta">¥${(c.price || 0).toFixed(2)} / 件</div></div>
+          <div class="cart-stepper">
+            <button data-action="cart-qty" data-idx="${idx}" data-delta="-1">−</button>
+            <b>${c.qty}</b>
+            <button data-action="cart-qty" data-idx="${idx}" data-delta="1">＋</button>
+          </div>
+          <span class="cart-price">¥${((c.price || 0) * c.qty).toFixed(2)}</span>
+        </div>`).join('') : '<div class="empty-note">购物车还是空的，去食材页或食谱里加购吧</div>'}
+      </section>
+      <div class="summary-bar"><span>已选 <b>${count}</b> 件 · 合计 <b>¥${amount.toFixed(2)}</b></span><button class="btn btn-primary" data-action="checkout">确认下单 · 自动入库</button></div>`;
   }
   function pageDevice() {
     const d = STATE.device;
@@ -299,7 +298,7 @@
        <div class="detail-row"><span>剩余</span><b>${i.remainingDays === 0 ? '已过期' : i.remainingDays + ' 天'}</b></div>
        <div class="detail-row"><span>来源</span><b>${esc(i.source)}</b></div>
        ${recHtml}
-       <div class="modal-actions"><button class="btn btn-ghost" data-action="close">关闭</button><button class="btn btn-primary" data-action="add-restock" data-name="${esc(i.name)}">加入补货清单</button></div>`);
+       <div class="modal-actions"><button class="btn btn-ghost" data-action="close">关闭</button><button class="btn btn-primary" data-action="add-restock" data-name="${esc(i.name)}">加入购物车</button></div>`);
   }
   function showRecipeModal(id) {
     const r = RECIPES.find(x => x.id === id);
@@ -347,7 +346,7 @@
     openModal(modalHead(emojiIcon(dish.emoji), dish.name, dish.custom ? '按你想的菜整理好了，再对照冰箱' : '按菜名对照了冰箱食材') +
       `<div class="detail-row"><span>用时</span><b>${dish.minutes} 分钟</b></div>
        <div class="detail-row"><span>冰箱已有</span><b>${have.length ? have.map(esc).join('、') : '没找到明确用料'}</b></div>
-       <div class="detail-row"><span>建议补货</span><b>${need.length ? need.map(esc).join('、') : '暂时不用补'}</b></div>
+       <div class="detail-row"><span>建议加购</span><b>${need.length ? need.map(esc).join('、') : '暂时不用买'}</b></div>
        <div class="detail-row"><span>做法</span><span>${dish.steps.map(esc).join(' → ')}</span></div>
        <div class="modal-actions"><button class="btn btn-ghost" data-action="dish-modal">换个菜名</button><button class="btn btn-primary" data-action="close">知道了</button></div>`);
   }
@@ -512,15 +511,9 @@
   function addToCart(sku, rid) {
     const p = PRODUCTS.find(x => x.sku === sku); if (!p) return;
     const exist = STATE.cart.find(c => c.sku === sku);
-    if (exist) exist.qty += 1; else STATE.cart.push({ sku, name: p.name, qty: 1, fromRestockId: rid });
+    if (exist) { exist.qty += 1; exist.selected = true; }
+    else STATE.cart.push({ sku, name: p.name, price: p.price, qty: 1, selected: true, fromRestockId: rid });
     if (rid) { const r = STATE.restock.find(x => x.id === rid); if (r) r.status = '已加购'; }
-  }
-  function showAutoRestock() {
-    const pending = STATE.restock.filter(r => r.status === '待补').slice(0, 3);
-    if (!pending.length) return;
-    openModal(modalHead('🛒', '要顺手补货吗？', '这几样常买的可能快用完了') +
-      `<div class="detail-row"><span>建议补货</span><b>${pending.map(r => esc(r.name)).join('、')}</b></div>
-       <div class="modal-actions"><button class="btn btn-ghost" data-action="auto-manual">我自己补</button><button class="btn btn-primary" data-action="auto-order">自动加购</button></div>`);
   }
   function showCartModal() {
     openModal(modalHead('🛒', '购物车', STATE.cart.length + ' 件商品') +
@@ -561,44 +554,39 @@
     if (a === 'voice-quick') { showAddModal('text'); setTimeout(() => startVoice('text'), 120); return; }
     if (a === 'voice-manual') { startVoice('manual'); return; }
     if (a === 'voice-text') { startVoice('text'); return; }
-    if (a === 'restock-toggle') {
-      const id = el.dataset.id;
-      if (STATE.checked.has(id)) STATE.checked.delete(id); else STATE.checked.add(id);
+    if (a === 'cart-select-all') {
+      const allOn = STATE.cart.length > 0 && STATE.cart.every(c => c.selected);
+      STATE.cart.forEach(c => { c.selected = !allOn; });
       render(); return;
+    }
+    if (a === 'cart-select') {
+      const c = STATE.cart[+el.dataset.idx];
+      if (c) { c.selected = !c.selected; render(); }
+      return;
+    }
+    if (a === 'cart-qty') {
+      const c = STATE.cart[+el.dataset.idx];
+      if (c) { c.qty = Math.max(1, c.qty + (+el.dataset.delta || 1)); render(); }
+      return;
     }
     if (a === 'add-restock') {
       const name = el.dataset.name;
-      const exists = STATE.restock.some(r => r.name === name);
-      if (!exists) STATE.restock.push({ id: 'rs-' + Date.now(), name, suggestQty: 1, unit: '份', source: '手动', status: '待补' });
-      closeModal(); render(); toast(exists ? '已在补货清单中' : '已加入补货清单'); return;
-    }
-    if (a === 'restock-add') {
-      const picked = STATE.restock.filter(r => STATE.checked.has(r.id) && r.status === '待补');
-      let added = 0;
-      picked.forEach(r => { const sku = Object.keys(PRODUCT_MAPPING).find(k => PRODUCT_MAPPING[k] === r.name); if (sku) { addToCart(sku, r.id); added += 1; } });
-      render();
-      if (added) go('cart'); else toast('请先勾选可加购的食材');
-      return;
-    }
-    if (a === 'auto-manual') { closeModal(); toast('已保留在补货清单'); return; }
-    if (a === 'auto-order') {
-      let added = 0;
-      STATE.restock.filter(r => r.status === '待补').slice(0, 3).forEach(r => {
-        const sku = Object.keys(PRODUCT_MAPPING).find(k => PRODUCT_MAPPING[k] === r.name);
-        if (sku) { addToCart(sku, r.id); added += 1; }
-      });
-      closeModal(); render();
-      if (added) go('cart'); else toast('暂无可自动加购的食材');
+      const sku = Object.keys(PRODUCT_MAPPING).find(k => PRODUCT_MAPPING[k] === name);
+      closeModal();
+      if (sku) { addToCart(sku); render(); toast('已加入购物车'); }
+      else toast('该食材暂不支持在线加购');
       return;
     }
     if (a === 'cart-open') { go('cart'); return; }
-    if (a === 'cart-qty') { const c = STATE.cart[+el.dataset.idx]; if (c) { c.qty += 1; render(); } return; }
     if (a === 'checkout') {
-      STATE.cart.forEach(c => { const it = purchaseToItem(c.sku); if (it) ITEMS.push(it); });
-      STATE.cart = []; closeModal(); go('home'); toast('下单成功，食材已自动入库'); return;
+      const picked = STATE.cart.filter(c => c.selected);
+      if (!picked.length) { toast('请先勾选要下单的商品'); return; }
+      picked.forEach(c => { const it = purchaseToItem(c.sku); if (it) ITEMS.push(it); });
+      STATE.cart = STATE.cart.filter(c => !c.selected);
+      closeModal(); go('home'); toast('下单成功，食材已自动入库'); return;
     }
     if (a === 'pupu') { showPupuModal(); return; }
-    if (a === 'pupu-done') { closeModal(); go('home'); toast('补货完成，冰箱已更新'); return; }
+    if (a === 'pupu-done') { closeModal(); go('home'); toast('采购完成，冰箱已更新'); return; }
     if (a === 'model') { showModelModal(); return; }
     if (a === 'choose-model') { applyModel(el.dataset.model); return; }
     if (a === 'pair') { showPairModal(); return; }

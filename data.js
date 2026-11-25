@@ -202,11 +202,15 @@ function purchaseToItem(sku) {
 
 /* ---------- 冰箱显示屏状态 ---------- */
 const STATE = {
-  appPage: 'home',         // nfc | home | fridge | recipes | recipe | restock | product | cart | device
+  appPage: 'home',         // nfc | home | fridge | recipes | recipe | product | cart | device
   recipeId: 'rc-01',
   productSku: null,
   restock: RESTOCK_ITEMS.map(x => ({ ...x })),
-  cart: [],                // { sku, name, qty, fromRestockId }
+  cart: RESTOCK_ITEMS.map(r => {
+    const sku = Object.keys(PRODUCT_MAPPING).find(k => PRODUCT_MAPPING[k] === r.name);
+    const p = sku ? PRODUCTS.find(x => x.sku === sku) : null;
+    return p ? { sku, name: p.name, price: p.price, qty: 1, selected: true } : null;
+  }).filter(Boolean),       // { sku, name, price, qty, selected }
   checked: new Set(),      // 补货清单勾选状态
   device: { ...DEVICE },
   expiryDay: 3,            // 到期提醒筛选：0=已过期；1/2/3/7=N天内
